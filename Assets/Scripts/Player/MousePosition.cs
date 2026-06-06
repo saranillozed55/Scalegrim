@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,37 +12,43 @@ public class MousePosition : MonoBehaviour
         _mainCamera = Camera.main;
     }
 
-    private void OnEnable()
+    private void Start()
     {
         InputManager.Instance.OnLeftClickPressed += HandleLeftClickPressed;
         InputManager.Instance.OnRightClickPressed += HandleRightClickPressed;
     }
+
     private void OnDisable()
     {
-        InputManager.Instance.OnLeftClickPressed -= HandleLeftClickPressed;
-        InputManager.Instance.OnRightClickPressed -= HandleRightClickPressed;
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnLeftClickPressed -= HandleLeftClickPressed;
+            InputManager.Instance.OnRightClickPressed -= HandleRightClickPressed;
+        }
     }
 
     private void HandleLeftClickPressed()
     {
-        if (!TryGetHitCard(out RaycastHit hit)) return;
-        Debug.Log("Clicked card: " + hit.collider.gameObject.name);
+        Debug.Log("Left Clicking");
+        if (!TryGetHit(out RaycastHit hit)) return;
+
+        var clickable = hit.collider.GetComponentInParent<IClickable>();
+        if (clickable != null)
+        {
+            // Handle card click logic here
+            clickable.OnClick();
+        }
     }
 
     private void HandleRightClickPressed()
     {
-        if (!TryGetHitCard(out RaycastHit hit)) return;
+        if (!TryGetHit(out RaycastHit hit)) return;
         Debug.Log("Clicked card: " + hit.collider.gameObject.name);
     }
 
-    private void Update()
-    {
-        
-    }
-
-    private bool TryGetHitCard(out RaycastHit hit)
+    private bool TryGetHit(out RaycastHit hit)
     {
         Ray ray = _mainCamera.ScreenPointToRay(InputManager.Instance.MouseScreenPosition);
-        return Physics.Raycast(ray, out hit, Mathf.Infinity, _cardLayer);
+        return Physics.Raycast(ray, out hit, Mathf.Infinity);
     }
 }

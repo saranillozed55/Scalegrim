@@ -1,82 +1,115 @@
 using DG.Tweening;
 using System.Collections.Generic;
+using Unity.Cinemachine;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.Splines;
+using Scene = UnityEngine.SceneManagement.Scene;
 
-public class HandManager : MonoBehaviour
+public class HandManager : GenericSingleton<HandManager>
 {
+    public HandState CurrentHandState { get; private set; }
+
     [Header("Settings")]
     [SerializeField] private int maxHandSize;
-    [SerializeField] private float cardSpacing = 0.08f; // Adjust this value to increase/decrease spacing between cards
     [SerializeField] private LayerMask _cardLayer;
     [SerializeField] private GameObject cardPrefab; // change this to specific card prefabs
+    [SerializeField] private float cardOverlap = 0.15f;
 
     [Header("References")]
-    [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private Transform spawnPoint;
-    //[SerializeField] private float cameraFacingBlend = 0.5f;
+    [SerializeField] private Transform _viewToUsePoint;
+    [SerializeField] private Transform _handPosition;
+    [SerializeField] private CinemachineCamera _fpCamera;
 
+
+    [Header("Listener to Event Channels")]
+    [SerializeField] private CardEventChannelSO _cardClicked;
+
+    [Header("Broadcast to Event Channels")]
+    [SerializeField] private CHSEventChannelSO _cardUnselected; 
+
+    private bool _allowCardHover = true;
     private GameObject _currentHoveredCard;
+    private Card _currentSelectedCard;
+    private List<GameObject> _handCards = new();
 
-    private List<GameObject> handCards = new();
+    public Card CurrentSelectedCard => _currentSelectedCard;
 
     private void Update()
     {
-        if(Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             DrawCard();
         }
-        if(Keyboard.current.dKey.wasPressedThisFrame)
+        if (Keyboard.current.dKey.wasPressedThisFrame)
         {
             ClearCards();
         }
-        HandleCardHover();
+
+        if (_allowCardHover)
+        {
+            HandleCardHover();
+        }
+    }
+
+    private void OnEnable()
+    {
+        _cardClicked.onEventRaised += CardTempLeave;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        _cardClicked.onEventRaised -= CardTempLeave;
+        InputManager.Instance.OnBackButtonPressed -= CardBackToHand;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        FindSceneDependencies();
+    }
+
+    private void FindSceneDependencies() // Move this
+    {
+        _viewToUsePoint = GameObject.FindWithTag("ViewToUse").transform;
+        _fpCamera = GameObject.FindWithTag("FPCamera").transform.GetComponent<CinemachineCamera>();
+        CurrentHandState = HandState.InHand; // change
+        InputManager.Instance.OnBackButtonPressed += CardBackToHand;
     }
 
     private void DrawCard()
     {
-        if(handCards.Count >= maxHandSize) return;
+        if(_handCards.Count >= maxHandSize) return;
         GameObject newCard = Instantiate(cardPrefab, spawnPoint.position, spawnPoint.rotation);
-        handCards.Add(newCard);
+        _handCards.Add(newCard);
         UpdateCardPosition();
     }
 
     private void UpdateCardPosition()
     {
-        if (handCards.Count == 0) return;
+        Vector3 handCenter = _handPosition.position;
 
-        float totalSpread = (handCards.Count - 1) * cardSpacing;
-        //float cardSpacing = 1f / handCards.Count;
-        float firstCardPosition = 0.5f - totalSpread / 2f; // Center the cards around the middle of the spline
-        Spline spline = splineContainer.Spline;
-
-        for (int i = 0; i < handCards.Count; i++)
+        for (int i = 0; i < _handCards.Count; i++)
         {
-            float p = firstCardPosition + i * cardSpacing;
+            float offset = i - (_handCards.Count - 1) / 2f;
+            Vector3 position = handCenter + _fpCamera.transform.right * (offset * cardOverlap);
 
-            // Transform from spline local space → world space
-            Vector3 splinePosition = splineContainer.transform.TransformPoint(spline.EvaluatePosition(p));
+            // last card (highest index) is closest to camera
+            position -= _fpCamera.transform.forward * (i * 0.01f);
 
-            // Tangent is forward, up is up — construct rotation correctly
-            Vector3 forward = spline.EvaluateTangent(p);
-            Vector3 up = spline.EvaluateUpVector(p);
-            Quaternion splineRotation = Quaternion.LookRotation(forward, up);
+            Quaternion rotation = Quaternion.Euler(-90f, 180f, 0f);
 
-            //// Rotation that points the card toward the camera
-            //Vector3 dirToCamera = Camera.main.transform.position - splinePosition;
-            //Quaternion cameraRotation = Quaternion.LookRotation(-dirToCamera, up);
+            Card card = _handCards[i].GetComponent<Card>();
+            card._basePosition = position;
+            card._baseRotation = rotation;
 
-            //// Blend between the two
-            //Quaternion rotation = Quaternion.Slerp(splineRotation, cameraRotation, cameraFacingBlend);
-
-            splinePosition += up * (i * 0.02f); // Add vertical offset based on card index
-
-            handCards[i].GetComponentInChildren<Card>().SetBasePosition(splinePosition); // Set the base position for hover effects
-            handCards[i].transform.DOMove(splinePosition, 0.25f);
-
-            // Fix 3: Use world-space rotation tween
-            handCards[i].transform.DORotateQuaternion(splineRotation, 0.25f);
+            _handCards[i].transform.DOKill();
+            _handCards[i].transform.DOMove(position, 0.25f);
+            _handCards[i].transform.DORotateQuaternion(rotation, 0.25f);
         }
     }
 
@@ -93,13 +126,13 @@ public class HandManager : MonoBehaviour
             }
             if(_currentHoveredCard != null)
             {
-                _currentHoveredCard.GetComponentInChildren<IHoverable>()?.OnHoverExit();
+                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverExit();
             }
             //Enter new, only if it's a card in hand
-            if(handCards.Contains(hitCard))
+            if(_handCards.Contains(hitCard))
             {
                 _currentHoveredCard = hitCard;
-                _currentHoveredCard.GetComponentInChildren<IHoverable>()?.OnHoverEnter();
+                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverEnter();
             }
             else
             {
@@ -111,7 +144,7 @@ public class HandManager : MonoBehaviour
             //ray cast hit nothing
             if(_currentHoveredCard != null)
             {
-                _currentHoveredCard.GetComponentInChildren<IHoverable>()?.OnHoverExit();
+                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverExit();
                 _currentHoveredCard = null;
             }
         }
@@ -119,11 +152,68 @@ public class HandManager : MonoBehaviour
 
     public void ClearCards()
     {
-        if (handCards == null || handCards.Count == 0) return;
-        foreach(var card in handCards)
+        if (_handCards == null || _handCards.Count == 0) return;
+        foreach(var card in _handCards)
         {
             Destroy(card);
         }
-        handCards.Clear();
+        _handCards.Clear();
+    }
+
+    private void CardTempLeave(Card card)
+    {
+        _allowCardHover = false;
+        _currentSelectedCard = card;
+        _handCards.Remove(card.gameObject);
+
+        SwitchHandState(HandState.Selected);
+        _currentSelectedCard.transform.DOMove(_viewToUsePoint.position, 0.3f);
+        _currentSelectedCard.transform.DORotateQuaternion(Quaternion.Euler(180f, -180f, 0), 0.3f);
+    }
+
+    private void CardBackToHand()
+    {
+        if (_currentSelectedCard == null) return;
+
+        _handCards.Add(_currentSelectedCard.gameObject);
+
+        _currentSelectedCard.transform.DOKill();
+
+        Quaternion rotation = _currentSelectedCard.GetComponent<Card>()._baseRotation;
+        _currentSelectedCard.transform.DORotateQuaternion(rotation, 0.25f);
+
+        _currentSelectedCard = null;
+        _allowCardHover = true;
+
+        SwitchHandState(HandState.InHand);
+        _cardUnselected.RaiseEvent(CurrentHandState);
+        UpdateCardPosition();
+    }
+
+    public void PlayCurrentCard(CardDropArea area)
+    {
+        if (_currentSelectedCard == null) return;
+
+        Card playedCard = _currentSelectedCard;
+        _currentSelectedCard = null;
+
+        playedCard.transform.DOKill();
+        playedCard.transform.DOMove(area.transform.position, 0.3f).OnComplete(() => {
+            Debug.Log("OnComplete fired");
+            playedCard.CardIsPlayed();
+            _allowCardHover = true;
+            });
+
+        SwitchHandState(HandState.InHand);
+        UpdateCardPosition();
+        Debug.Log(_handCards.Count);
+    }
+
+    public void SwitchHandState(HandState state)
+    {
+        if(CurrentHandState != state)
+        {
+            CurrentHandState = state;
+        }
     }
 }
