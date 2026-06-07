@@ -19,6 +19,7 @@ public class CinemachineSwitcher : MonoBehaviour
     [Header("Listener to Event Channels")]
     [SerializeField] private CardEventChannelSO _cardClicked;
     [SerializeField] private CHSEventChannelSO _cardUnselected;
+    [SerializeField] private CHSEventChannelSO _cardPlayed;
     private void Awake()
     {
         _animator = GetComponent<Animator>();
@@ -27,6 +28,7 @@ public class CinemachineSwitcher : MonoBehaviour
     private void OnEnable()
     {
         _cardClicked.onEventRaised += SwitchState;
+        _cardPlayed.onEventRaised += SwitchCameraState;
         _cardUnselected.onEventRaised += SwitchCameraState;
         _inputAction.Enable();
     }
@@ -34,6 +36,7 @@ public class CinemachineSwitcher : MonoBehaviour
     {
         _cardClicked.onEventRaised -= SwitchState;
         _cardUnselected.onEventRaised -= SwitchCameraState;
+        _cardPlayed.onEventRaised -= SwitchCameraState;
         _inputAction.Disable();
     }
     private void Start()

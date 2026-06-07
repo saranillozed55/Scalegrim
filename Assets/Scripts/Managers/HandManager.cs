@@ -29,7 +29,8 @@ public class HandManager : GenericSingleton<HandManager>
     [SerializeField] private CardEventChannelSO _cardClicked;
 
     [Header("Broadcast to Event Channels")]
-    [SerializeField] private CHSEventChannelSO _cardUnselected; 
+    [SerializeField] private CHSEventChannelSO _cardUnselected;
+    [SerializeField] private CHSEventChannelSO _cardPlayed;
 
     private bool _allowCardHover = true;
     private GameObject _currentHoveredCard;
@@ -162,6 +163,7 @@ public class HandManager : GenericSingleton<HandManager>
 
     private void CardTempLeave(Card card)
     {
+        Debug.Log("Num of cards in hand before playing: " + _handCards.Count);
         _allowCardHover = false;
         _currentSelectedCard = card;
         _handCards.Remove(card.gameObject);
@@ -190,27 +192,36 @@ public class HandManager : GenericSingleton<HandManager>
         UpdateCardPosition();
     }
 
-    public void PlayCurrentCard(CardDropArea area)
+    public void PlayCurrentCard(CardDropArea targetArea)
     {
-        if (_currentSelectedCard == null) return;
+        if (_currentSelectedCard == null || targetArea.SlotFaction != Faction.Player) return;
+        Debug.Log("Num of cards in hand after playing: " + _handCards.Count);
 
         Card playedCard = _currentSelectedCard;
         _currentSelectedCard = null;
 
         playedCard.transform.DOKill();
-        playedCard.transform.DOMove(area.transform.position, 0.3f).OnComplete(() => {
+        playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+        {
             Debug.Log("OnComplete fired");
             playedCard.CardIsPlayed();
+            targetArea.OnCardDrop();
             _allowCardHover = true;
-            });
+        });
 
         SwitchHandState(HandState.InHand);
+        _cardPlayed.RaiseEvent(CurrentHandState);
         UpdateCardPosition();
-        Debug.Log(_handCards.Count);
+    }
+
+    private void OnHandFocus()
+    {
+        // this should be called when we press an input, like a button or something
     }
 
     public void SwitchHandState(HandState state)
     {
+        
         if(CurrentHandState != state)
         {
             CurrentHandState = state;

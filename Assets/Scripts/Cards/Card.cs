@@ -39,7 +39,7 @@ public class Card : MonoBehaviour, IHoverable, IClickable
 
     public void OnClick()
     {
-        if (_isSelected) return;
+        if (_isSelected || _cardIsPlaced) return;
         // Implement card click behavior here
         _cardClicked.RaiseEvent(this);
         Debug.Log($"Card {gameObject.name} clicked!");
