@@ -24,13 +24,13 @@ public class HandManager : GenericSingleton<HandManager>
     [SerializeField] private Transform _handPosition;
     [SerializeField] private CinemachineCamera _fpCamera;
 
-
     [Header("Listener to Event Channels")]
     [SerializeField] private CardEventChannelSO _cardClicked;
 
     [Header("Broadcast to Event Channels")]
-    [SerializeField] private CHSEventChannelSO _cardUnselected;
+    //[SerializeField] private CHSEventChannelSO _cardUnselected;
     [SerializeField] private CHSEventChannelSO _cardPlayed;
+    [SerializeField] private CameraStateEventChannel _cardUnselected;
 
     private bool _allowCardHover = true;
     private GameObject _currentHoveredCard;
@@ -43,7 +43,7 @@ public class HandManager : GenericSingleton<HandManager>
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            DrawCard();
+            //DrawCard();
         }
         if (Keyboard.current.dKey.wasPressedThisFrame)
         {
@@ -82,10 +82,10 @@ public class HandManager : GenericSingleton<HandManager>
         InputManager.Instance.OnBackButtonPressed += CardBackToHand;
     }
 
-    private void DrawCard()
+    public void DrawCard(GameObject newCard)
     {
         if(_handCards.Count >= maxHandSize) return;
-        GameObject newCard = Instantiate(cardPrefab, spawnPoint.position, spawnPoint.rotation);
+        //GameObject newCard = Instantiate(cardPrefab, spawnPoint.position, spawnPoint.rotation);
         _handCards.Add(newCard);
         UpdateCardPosition();
     }
@@ -110,7 +110,7 @@ public class HandManager : GenericSingleton<HandManager>
 
             _handCards[i].transform.DOKill();
             _handCards[i].transform.DOMove(position, 0.25f);
-            _handCards[i].transform.DORotateQuaternion(rotation, 0.25f);
+            _handCards[i].transform.DORotateQuaternion(CardRotations._cardFacePlayerVertical, 0.25f);
         }
     }
 
@@ -170,7 +170,7 @@ public class HandManager : GenericSingleton<HandManager>
 
         SwitchHandState(HandState.Selected);
         _currentSelectedCard.transform.DOMove(_viewToUsePoint.position, 0.3f);
-        _currentSelectedCard.transform.DORotateQuaternion(Quaternion.Euler(180f, -180f, 0), 0.3f);
+        _currentSelectedCard.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f);
     }
 
     private void CardBackToHand()
@@ -188,13 +188,15 @@ public class HandManager : GenericSingleton<HandManager>
         _allowCardHover = true;
 
         SwitchHandState(HandState.InHand);
-        _cardUnselected.RaiseEvent(CurrentHandState);
+
+        _cardUnselected.RaiseEvent(CameraState.FPCamera);
+
         UpdateCardPosition();
     }
 
     public void PlayCurrentCard(CardDropArea targetArea)
     {
-        if (_currentSelectedCard == null || targetArea.SlotFaction != Faction.Player) return;
+        if (_currentSelectedCard == null || targetArea.SlotOwner != Owner.Player) return;
         Debug.Log("Num of cards in hand after playing: " + _handCards.Count);
 
         Card playedCard = _currentSelectedCard;
@@ -203,13 +205,13 @@ public class HandManager : GenericSingleton<HandManager>
         playedCard.transform.DOKill();
         playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
         {
-            Debug.Log("OnComplete fired");
             playedCard.CardIsPlayed();
-            targetArea.OnCardDrop();
+            targetArea.OnCardDrop(playedCard);
             _allowCardHover = true;
         });
 
         SwitchHandState(HandState.InHand);
+        _cardUnselected.RaiseEvent(CameraState.FPCamera);
         _cardPlayed.RaiseEvent(CurrentHandState);
         UpdateCardPosition();
     }
@@ -221,7 +223,6 @@ public class HandManager : GenericSingleton<HandManager>
 
     public void SwitchHandState(HandState state)
     {
-        
         if(CurrentHandState != state)
         {
             CurrentHandState = state;

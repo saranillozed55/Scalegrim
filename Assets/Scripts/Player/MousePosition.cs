@@ -29,7 +29,6 @@ public class MousePosition : MonoBehaviour
 
     private void HandleLeftClickPressed()
     {
-        Debug.Log("Left Clicking");
         if (!TryGetHit(out RaycastHit hit)) return;
 
         var clickable = hit.collider.GetComponentInParent<IClickable>();

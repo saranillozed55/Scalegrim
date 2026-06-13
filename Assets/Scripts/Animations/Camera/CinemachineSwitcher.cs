@@ -1,68 +1,92 @@
 using System;
+using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum CameraState { 
+    FPCamera,
+    BoardCamera,
+    HandCamera,
+    PlayerDeckCamera,
+}
+
 public class CinemachineSwitcher : MonoBehaviour
 {
-    [SerializeField] private InputAction _inputAction; // don't really use action because wan't this to be more even driven
-
-    private Animator _animator;
-
-    //update this for multiple cameras
-    private bool _fpCamera = true;
-
-    private int FpCamera = Animator.StringToHash("FPCamera");
-    private int PlaceCardCamera = Animator.StringToHash("PlaceCardCamera");
-    private int CardCamera = Animator.StringToHash("CardCamera");
-    private int DeckCamera = Animator.StringToHash("DeckCamera");
+    private CameraState _cameraState;
 
     [Header("Listener to Event Channels")]
-    [SerializeField] private CardEventChannelSO _cardClicked;
-    [SerializeField] private CHSEventChannelSO _cardUnselected;
-    [SerializeField] private CHSEventChannelSO _cardPlayed;
-    private void Awake()
-    {
-        _animator = GetComponent<Animator>();
-    }
+    [SerializeField] private CameraStateEventChannel _cardSelectedCam;
+    [SerializeField] private CameraStateEventChannel _cardUnselectedCam;
+    [SerializeField] private CameraStateEventChannel _onEndTurn;
+
+    [Header("References")]
+    [Space]
+    [SerializeField] private CinemachineCamera[] _cameras;
+        
+    [SerializeField] private CinemachineCamera _firstPersonCamera;
+    [SerializeField] private CinemachineCamera _boardCamera;
+    [SerializeField] private CinemachineCamera _startingCamera;
+
+    private CinemachineCamera _currentCamera;
 
     private void OnEnable()
     {
-        _cardClicked.onEventRaised += SwitchState;
-        _cardPlayed.onEventRaised += SwitchCameraState;
-        _cardUnselected.onEventRaised += SwitchCameraState;
-        _inputAction.Enable();
+
+        _cardSelectedCam.onEventRaised += SwitchCameraState;
+        _cardUnselectedCam.onEventRaised += SwitchCameraState;
+        _onEndTurn.onEventRaised += SwitchCameraState;
     }
     private void OnDisable()
     {
-        _cardClicked.onEventRaised -= SwitchState;
-        _cardUnselected.onEventRaised -= SwitchCameraState;
-        _cardPlayed.onEventRaised -= SwitchCameraState;
-        _inputAction.Disable();
+        _cardSelectedCam.onEventRaised -= SwitchCameraState;
+        _cardUnselectedCam.onEventRaised -= SwitchCameraState;
+        _onEndTurn.onEventRaised += SwitchCameraState;
     }
     private void Start()
     {
-        _inputAction.performed += _ => SwitchState(null); // just for testing
+        InitializeStartingCamera();        
     }
-
-    private void SwitchCameraState(HandState state)
+    private void InitializeStartingCamera()
     {
-        if(state == HandState.InHand)
+        _currentCamera = _startingCamera;
+        for(int i = 0; i < _cameras.Length; i++)
         {
-            _animator.Play(FpCamera);
+            if (_cameras[i] == _currentCamera)
+            {
+                _cameras[i].Priority = 20;
+            }
+            else
+            {
+                _cameras[i].Priority = 10;
+            }
         }
     }
 
-    private void SwitchState(Card card)
-    { 
-        if (card != null)
-        {
-            _animator.Play(PlaceCardCamera);
+    private void SwitchCameraState(CameraState state)
+    {
+        switch(state) {
+            case CameraState.FPCamera:
+                SwitchCamera(_firstPersonCamera);
+                break;
+            case CameraState.BoardCamera:
+                SwitchCamera(_boardCamera);
+                break;
+
         }
-        else
-        {
-            _animator.Play(FpCamera);
-        }
-        
-        _fpCamera = !_fpCamera;
     }
+
+    private void SwitchCamera(CinemachineCamera newCamera)
+    {
+        _currentCamera = newCamera;
+        _currentCamera.Priority = 20;
+        for(int i = 0; i < _cameras.Length;i++)
+        {
+            if (_cameras[i] != newCamera)
+            {
+                _cameras[i].Priority = 10;
+            }
+        }
+    }
+
 }

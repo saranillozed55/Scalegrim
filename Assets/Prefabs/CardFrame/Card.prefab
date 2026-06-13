@@ -10,43 +10,43 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.075
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.467
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -3.9909997
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.000000030908623
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.000000030908623
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -146,9 +146,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485def6afd992cc4c8939eaf0ebec57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Card
+  _cardData: {fileID: 11400000, guid: 004c9c616759ea34c9b44d8937229b55, type: 2}
   _cardClicked: {fileID: 11400000, guid: 69dcc6b57bbcd1e4c8f40e3faf4e249d, type: 2}
+  _cardSelected: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
+  _basePosition: {x: 0.075, y: 1.467, z: -3.9909997}
+  _placedPosition: {x: 0, y: 0, z: 0}
+  _baseRotation: {x: 0.00000003090862, y: 0.70710677, z: 0.70710677, w: -0.00000003090862}
   _cardIsPlaced: 0
-  _baseRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &7477820012167712369 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -8391222552659086748, guid: 9db838b8e458df048a17e51c5be8686b, type: 3}
