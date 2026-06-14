@@ -2,12 +2,25 @@ using UnityEngine;
 
 public class CombatManager : GenericSingleton<CombatManager>
 {
-    [Header("Listener to Event Channel")]
+    [Header("Broadcast to Event Channels")]
+    [SerializeField] private VoidEventChannel _onEnemyEndTurn;
+
+
+    [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
+
+
+    public bool IsInCombat { get; private set; }
 
     //[Header("Brodacast to Event Channels")]
 
-    private CardAttackInvoker _invoker = new CardAttackInvoker();
+    //private CardAttackInvoker _invoker = new CardAttackInvoker();
+
+    private void Start()
+    {
+        IsInCombat = false;
+    }
+
     private void OnEnable()
     {
         _onCombatStart.onEventRaised += StartCombat;
@@ -18,40 +31,38 @@ public class CombatManager : GenericSingleton<CombatManager>
         _onCombatStart.onEventRaised -= StartCombat;
     }
 
-    private void StartCombat()
+    private async void StartCombat()
     {
-        //queue up attack left to right
+        if (IsInCombat) return;
+
         Debug.Log("Cards should be attacking");
 
-
+        IsInCombat = true;
+        //player cards move
         foreach (Lane lane in BoardLaneManager.Instance.logicLanes)
         {
             if (lane.PlayerActiveCard != null)
             {
-                _invoker.EnqueueCommand(new CardAttackCommand(lane.PlayerActiveCard, lane, () => ApplyCombatDamage(lane.PlayerActiveCard, lane))); // FIX THIS 
-                //DON'T USE APPLY COMBAT DAMAGE, USE ANIMATION EVENTS IN UNITY ANIMATOR WINDOW
-            }
-            if (lane.EnemyActiveCard != null)
-            {
-                _invoker.EnqueueCommand(new CardAttackCommand(lane.EnemyActiveCard, lane, () => ApplyCombatDamage(lane.EnemyActiveCard, lane)));
+                await lane.PlayerActiveCard.PlayCardAttackAsync(Vector3.forward, lane.EnemyActiveCard); // Update parameter
+                //_invoker.EnqueueCommand(new CardAttackCommand(lane.PlayerActiveCard, lane)); 
             }
         }
+
+        //enemy cards move
+        foreach (Lane lane in BoardLaneManager.Instance.logicLanes)
+        {
+            if (lane.EnemyActiveCard != null)
+            {
+                await lane.EnemyActiveCard.PlayCardAttackAsync(Vector3.back, lane.PlayerActiveCard);
+                //_invoker.EnqueueCommand(new CardAttackCommand(lane.EnemyActiveCard, lane));
+            }
+        }
+
+        EndCombat();
     }
-
-    //WRITE DOWN HOW THE COMBAT SYSTEM IS GOING TO WORK FIRST. PROBLEM SOLVE :). PLAYER SHOULD ATTACK FIRST THEN THE ENEMY THEN QUEUE UP CARDS
-    private void ApplyCombatDamage(Card attacker, Lane lane)
+    public void EndCombat()
     {
-        if (attacker == null || lane == null) return;
-        Debug.Log("Animation finished and is dealing damage in lane: " + lane.LaneIndex + " AI component: " + lane.EnemyActiveCard + " PlayerComponent: " + lane.PlayerActiveCard);
-    }
-
-    private void EndCombat()
-    {
-
-    }
-
-    private void Update()
-    {
-        _invoker.Tick();
+        IsInCombat = false;
+        _onEnemyEndTurn.RaiseEvent();
     }
 }

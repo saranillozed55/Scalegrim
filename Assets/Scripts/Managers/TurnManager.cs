@@ -9,7 +9,7 @@ public class TurnManager : GenericSingleton<TurnManager>
 
 
     [Header("Listener to Event Channels")]
-    [SerializeField] private VoidEventChannel _onEndTurn;
+    [SerializeField] private VoidEventChannel _onPlayerEndTurn;
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
 
@@ -20,11 +20,13 @@ public class TurnManager : GenericSingleton<TurnManager>
 
     private void OnEnable()
     {
-        _onEndTurn.onEventRaised += SwitchTurnState;
+        _onPlayerEndTurn.onEventRaised += SwitchTurnState;
+        _onEnemyEndTurn.onEventRaised += SwitchTurnState;
     }
     private void OnDisable()
     {
-        _onEndTurn.onEventRaised -= SwitchTurnState;
+        _onPlayerEndTurn.onEventRaised -= SwitchTurnState;
+        _onEnemyEndTurn.onEventRaised -= SwitchTurnState;
     }
 
     private void SwitchTurnState() 

@@ -197,7 +197,6 @@ public class HandManager : GenericSingleton<HandManager>
     public void PlayCurrentCard(CardDropArea targetArea)
     {
         if (_currentSelectedCard == null || targetArea.SlotOwner != Owner.Player) return;
-        Debug.Log("Num of cards in hand after playing: " + _handCards.Count);
 
         Card playedCard = _currentSelectedCard;
         _currentSelectedCard = null;

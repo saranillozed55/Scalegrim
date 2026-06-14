@@ -19,6 +19,7 @@ public class CinemachineSwitcher : MonoBehaviour
     [SerializeField] private CameraStateEventChannel _cardSelectedCam;
     [SerializeField] private CameraStateEventChannel _cardUnselectedCam;
     [SerializeField] private CameraStateEventChannel _onEndTurn;
+    [SerializeField] private CameraStateEventChannel _onCombatEnd;
 
     [Header("References")]
     [Space]

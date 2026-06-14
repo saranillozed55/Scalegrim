@@ -393,7 +393,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 147fbe36a60c1c745bf9a17e5396cb6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClownFishCard
-  _cardData: {fileID: 11400000, guid: f75107490be466f47b5ca48a01f23938, type: 2}
+  baseDamage: 2
+  baseHealth: 3
   _cardClicked: {fileID: 11400000, guid: 69dcc6b57bbcd1e4c8f40e3faf4e249d, type: 2}
   _cardSelected: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
   _basePosition: {x: 0, y: 0, z: 0}

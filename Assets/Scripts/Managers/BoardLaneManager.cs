@@ -8,11 +8,10 @@ using UnityEngine.Analytics;
 
 public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
-    [SerializeField] private int _totalLanes = 3;
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
-
     public List<Lane> logicLanes = new List<Lane>();
+
 
     [Header("Broadcast to EventChannels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
@@ -90,6 +89,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         GameObject instance = Instantiate(cardPrefab.gameObject, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
 
         Card cardInstance = instance.GetComponent<Card>();
+        cardInstance.CardIsPlayed();
         logicLanes[laneIndex].EnemyQueuedCard = cardInstance;
         Vector3 targetPosition = targetPrepArea.transform.position;
 

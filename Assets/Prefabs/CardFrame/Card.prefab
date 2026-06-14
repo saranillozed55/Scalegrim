@@ -146,7 +146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485def6afd992cc4c8939eaf0ebec57d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Card
-  _cardData: {fileID: 11400000, guid: 004c9c616759ea34c9b44d8937229b55, type: 2}
+  baseDamage: 1
+  baseHealth: 5
   _cardClicked: {fileID: 11400000, guid: 69dcc6b57bbcd1e4c8f40e3faf4e249d, type: 2}
   _cardSelected: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
   _basePosition: {x: 0.075, y: 1.467, z: -3.9909997}

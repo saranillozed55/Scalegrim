@@ -2,13 +2,20 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using UnityEngine;
+using System.Threading;
 
 public class Card : MonoBehaviour, IHoverable, IClickable
 {
     private const int _placedCardLayer = 6;
 
-    [Header("Card DataSO")] // SO so we can change text mesh pro easier
-    [SerializeField] private CardData _cardData; // PROBLEM: If we have multiple of the same cards, the SO will be pointing to both of those so if they take damage they will both lose health
+    //[Header("Card DataSO")] // SO so we can change text mesh pro easier
+    //[SerializeField] private CardData _cardData; // PROBLEM: If we have multiple of the same cards, the SO will be pointing to both of those so if they take damage they will both lose health
+
+    [Header("Card Settings")]
+    [SerializeField] private int baseDamage;
+    [SerializeField] private int baseHealth;
+
+    public PlainCardData _cardData { get; private set; }
 
     [Header("BroadCast Event Channels")]
     [SerializeField] private CardEventChannelSO _cardClicked;
@@ -20,7 +27,13 @@ public class Card : MonoBehaviour, IHoverable, IClickable
     public Quaternion _baseRotation;
     public bool _cardIsPlaced = false;
 
-    public CardData CardData => _cardData;
+    private bool _cardIsAttacking = false;
+
+
+    private void Start()
+    {
+        _cardData = new PlainCardData(baseHealth, baseDamage);
+    }
 
     public void CardIsPlayed()
     {
@@ -58,38 +71,81 @@ public class Card : MonoBehaviour, IHoverable, IClickable
         Debug.Log($"Card {gameObject.name} clicked!");
     }
 
-    //THIS IS JUST A PLACEHOLDER, SOME CARDS WON'T ATTACK IN GAME SO WOULD WANT TO AN IATTACKER INTERFACE FOR THE CARDS THAT DO ATTACK  
-    public void PlayAttack(System.Action onImpact, System.Action onComplete, Vector3 attackDirection) //Call back parameter
+
+    public virtual async Awaitable PlayCardAttackAsync(Vector3 attackDirection, Card oppositeCard) // maybe dont use attackDirection but rather who owns this card
     {
+        _cardIsAttacking = true;
 
-        transform.DOKill();
-        transform.DOMove(_placedPosition + attackDirection * 0.3f, 0.15f).OnComplete(() =>
+        try
         {
-            onImpact?.Invoke();
+            transform.DOKill();
 
-            transform.DOMove(_placedPosition, 0.15f).OnComplete(() => onComplete?.Invoke());
-        });
-    }
+            await transform.DOMove(_placedPosition + attackDirection * 0.3f, 0.15f).SetEase(Ease.OutQuad).AsyncWaitForCompletion(); // must have await because DOTween runs async in the background so must call await
 
-    public virtual void CheckCardDeath()
-    {
-        //Play animation first.
-        if (_cardIsPlaced && _cardData.health <= 0 && !_cardData.isDead)
+            //Damage here as well
+            ApplyDamage(oppositeCard);
+
+            await transform.DOMove(_placedPosition, 0.15f).SetEase(Ease.InQuad).AsyncWaitForCompletion();
+        }
+        catch (Exception ex) 
         {
-            StartCoroutine(CardDeathRoutine());
+            Debug.LogWarning("Card action stopped because the card was removed: " + ex.Message);
+            transform.DOKill();
+        }
+        finally
+        {
+            _cardIsAttacking = false;
         }
     }
 
-    public void CardTakeDamage(Card attacker)
+    private void ApplyDamage(Card oppositeCard)
     {
-        _cardData.health -= attacker._cardData.damage;
+        if (oppositeCard == null)
+        {
+            Debug.Log("This should do damage to the enemy/person");
+            return;
+        }
+        else
+        {
+            oppositeCard._cardData._health -= this._cardData._damage;
+
+            CardTakeDamage(oppositeCard);
+            
+            Debug.Log($"Opposite Card health: {oppositeCard._cardData._health} and Damage done to it: {_cardData._damage}");
+        }
     }
 
-    private IEnumerator CardDeathRoutine()
+    public async virtual void CheckCardDeath()
+    {
+        //Play animation first.
+        if (_cardIsPlaced && _cardData._health <= 0 && !_cardData.isDead)
+        {
+            await CardDeathAsync();
+        }
+    }
+    
+    //opposite card takes damage
+    public void CardTakeDamage(Card attacker)
+    {
+        CheckCardDeath();
+        attacker._cardData._health -= this._cardData._damage;
+    }
+
+    private async Awaitable CardDeathAsync()
     {
         _cardData.isDead = true;
-        yield return new WaitForSeconds(3f);
-        _cardData.isDead = false;
-        Destroy(gameObject);
+        try
+        {
+            await Awaitable.WaitForSecondsAsync(1f);
+        }
+        catch(Exception ex)
+        {
+            Debug.LogWarning("Card death action stopped because the card was removed: " + ex.Message);
+        }
+        finally
+        {
+            _cardData.isDead = false;
+            Destroy(gameObject);
+        }
     }
 }

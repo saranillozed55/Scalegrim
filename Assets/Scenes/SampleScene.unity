@@ -405,6 +405,7 @@ MonoBehaviour:
   _cardSelectedCam: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
   _cardUnselectedCam: {fileID: 11400000, guid: e2517d71858c06743b2a7c9d58a93ea2, type: 2}
   _onEndTurn: {fileID: 11400000, guid: f5436d02217d4454ab5967d10241ed14, type: 2}
+  _onCombatEnd: {fileID: 0}
   _cameras:
   - {fileID: 849692302}
   - {fileID: 415385662}
@@ -1625,7 +1626,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a8b93c60f575f347b91d2cbeb8bc001, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardLaneManager
-  _totalLanes: 3
   _prepAreas:
   - {fileID: 1835653811}
   - {fileID: 1015739483}
@@ -2328,6 +2328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b22b8bf65313294b91694e7c534f71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatManager
+  _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   _onCombatStart: {fileID: 11400000, guid: 915cc0dac3f10634298ecb97b458aa6e, type: 2}
 --- !u!4 &1344698769
 Transform:
@@ -2571,8 +2572,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
   _onEndTurnCam: {fileID: 11400000, guid: f5436d02217d4454ab5967d10241ed14, type: 2}
-  _onEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
-  _onEnemyEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
+  _onPlayerEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
+  _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
 --- !u!4 &1520315114
 Transform:
   m_ObjectHideFlags: 0

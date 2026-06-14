@@ -7,10 +7,10 @@ public class CardUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text _cardHealthText;
 
-    private void Awake()
+    private void Start()
     {
         _card = GetComponent<Card>();
-        _cardHealthText.text = _card.CardData.health.ToString();
+        _cardHealthText.text = _card._cardData._health.ToString();
     }
     
 }

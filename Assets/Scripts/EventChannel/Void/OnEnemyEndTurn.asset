@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abf7efb1164a3bb40b503870d51d5ed3, type: 3}
-  m_Name: OnEndTurn
-  m_EditorClassIdentifier: Assembly-CSharp::CameraStateEventChannel
+  m_Script: {fileID: 11500000, guid: 8ceb689454eea974da91e962d18b6ea1, type: 3}
+  m_Name: OnEnemyEndTurn
+  m_EditorClassIdentifier: Assembly-CSharp::VoidEventChannel
