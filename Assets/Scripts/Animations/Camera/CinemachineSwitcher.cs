@@ -1,4 +1,6 @@
+using DG.Tweening;
 using System;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,13 +9,13 @@ using UnityEngine.InputSystem;
 public enum CameraState { 
     FPCamera,
     BoardCamera,
-    HandCamera,
+    PlayerHandCamera,
     PlayerDeckCamera,
 }
 
-public class CinemachineSwitcher : MonoBehaviour
+public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 {
-    private CameraState _cameraState;
+    private CameraState _currentCameraState;
 
     [Header("Listener to Event Channels")]
     [SerializeField] private CameraStateEventChannel _cardSelectedCam;
@@ -28,66 +30,109 @@ public class CinemachineSwitcher : MonoBehaviour
     [SerializeField] private CinemachineCamera _firstPersonCamera;
     [SerializeField] private CinemachineCamera _boardCamera;
     [SerializeField] private CinemachineCamera _startingCamera;
+    [SerializeField] private CinemachineCamera _playerDeckCamera;
+    [SerializeField] private CinemachineCamera _playerHandCamera;
+
+    private Dictionary<CameraState, CinemachineCamera> _cameraMap;
 
     private CinemachineCamera _currentCamera;
+
+    private Quaternion _fpCameraBaseRotation;
 
     private void OnEnable()
     {
 
-        _cardSelectedCam.onEventRaised += SwitchCameraState;
-        _cardUnselectedCam.onEventRaised += SwitchCameraState;
-        _onEndTurn.onEventRaised += SwitchCameraState;
+        _cardSelectedCam.onEventRaised += SwitchState;
+        _cardUnselectedCam.onEventRaised += SwitchState;
+        _onEndTurn.onEventRaised += SwitchState;
+
+        InputManager.Instance.OnBackButtonPressed += HandleBackButton;
+        InputManager.Instance.OnForwardButtonPressed += HandleForwardButton;
+
     }
     private void OnDisable()
     {
-        _cardSelectedCam.onEventRaised -= SwitchCameraState;
-        _cardUnselectedCam.onEventRaised -= SwitchCameraState;
-        _onEndTurn.onEventRaised += SwitchCameraState;
+        _cardSelectedCam.onEventRaised -= SwitchState;
+        _cardUnselectedCam.onEventRaised -= SwitchState;
+        _onEndTurn.onEventRaised -= SwitchState;
+
+        InputManager.Instance.OnBackButtonPressed -= HandleBackButton;
+        InputManager.Instance.OnForwardButtonPressed -= HandleForwardButton;
     }
+
+    private void Update()
+    {
+        //testing 
+        if (Keyboard.current.mKey.wasPressedThisFrame)
+        {
+            SwitchState(CameraState.PlayerHandCamera);
+        }
+    }
+
     private void Start()
     {
-        InitializeStartingCamera();        
+        InitCameras();
+
+        _fpCameraBaseRotation = _firstPersonCamera.transform.rotation;
     }
-    private void InitializeStartingCamera()
+
+    private void InitCameras()
     {
         _currentCamera = _startingCamera;
-        for(int i = 0; i < _cameras.Length; i++)
+        _cameraMap = new Dictionary<CameraState, CinemachineCamera>
         {
-            if (_cameras[i] == _currentCamera)
-            {
-                _cameras[i].Priority = 20;
-            }
-            else
-            {
-                _cameras[i].Priority = 10;
-            }
-        }
+            {CameraState.FPCamera, _firstPersonCamera},
+            {CameraState.BoardCamera, _boardCamera},
+            {CameraState.PlayerDeckCamera, _playerDeckCamera},
+            {CameraState.PlayerHandCamera, _playerHandCamera}
+        };
     }
 
-    private void SwitchCameraState(CameraState state)
+    private void HandleForwardButton()
     {
-        switch(state) {
-            case CameraState.FPCamera:
-                SwitchCamera(_firstPersonCamera);
-                break;
-            case CameraState.BoardCamera:
-                SwitchCamera(_boardCamera);
-                break;
-
-        }
-    }
-
-    private void SwitchCamera(CinemachineCamera newCamera)
-    {
-        _currentCamera = newCamera;
-        _currentCamera.Priority = 20;
-        for(int i = 0; i < _cameras.Length;i++)
+        if(_currentCameraState == CameraState.PlayerHandCamera)
         {
-            if (_cameras[i] != newCamera)
-            {
-                _cameras[i].Priority = 10;
-            }
+            SwitchState(CameraState.FPCamera);
+        }
+        else if(_currentCameraState == CameraState.FPCamera)
+        {
+            SwitchState(CameraState.BoardCamera);
         }
     }
 
+    private void HandleBackButton()
+    {
+        if(_currentCameraState == CameraState.FPCamera)
+        {
+            SwitchState(CameraState.PlayerHandCamera);
+        }
+        else if(_currentCameraState == CameraState.BoardCamera)
+        {
+            SwitchState(CameraState.FPCamera);
+        }
+    }
+
+    private void SwitchState(CameraState newState)
+    {
+        if (!_cameraMap.TryGetValue(newState, out CinemachineCamera targetCamera))
+        {
+            Debug.LogWarning($"[CinemachineManager/CinemachineSwitcher] No map registered for state: {newState}");
+            return;
+        }
+
+        if (_currentCamera == targetCamera) return;
+        _currentCamera.Priority = 0;
+        _currentCamera = targetCamera;
+        _currentCameraState = newState;
+        _currentCamera.Priority = 1;
+    }
+
+    public void FocusBoardView()
+    {
+        SwitchState(CameraState.BoardCamera);
+    }
+    public void FocusFPCameraView()
+    {
+        SwitchState(CameraState.FPCamera);
+    }
 }

@@ -24,27 +24,19 @@ public class HandManager : GenericSingleton<HandManager>
     [SerializeField] private Transform _handPosition;
     [SerializeField] private CinemachineCamera _fpCamera;
 
-    [Header("Listener to Event Channels")]
-    [SerializeField] private CardEventChannelSO _cardClicked;
-
-    [Header("Broadcast to Event Channels")]
-    //[SerializeField] private CHSEventChannelSO _cardUnselected;
-    [SerializeField] private CHSEventChannelSO _cardPlayed;
-    [SerializeField] private CameraStateEventChannel _cardUnselected;
-
+    private MousePosition _mousePosition;
+    
     private bool _allowCardHover = true;
     private GameObject _currentHoveredCard;
-    private Card _currentSelectedCard;
     private List<GameObject> _handCards = new();
 
-    public Card CurrentSelectedCard => _currentSelectedCard;
-
+    protected override void Awake()
+    {
+        base.Awake();
+        _mousePosition = FindFirstObjectByType<MousePosition>();
+    }
     private void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            //DrawCard();
-        }
         if (Keyboard.current.dKey.wasPressedThisFrame)
         {
             ClearCards();
@@ -58,14 +50,12 @@ public class HandManager : GenericSingleton<HandManager>
 
     private void OnEnable()
     {
-        _cardClicked.onEventRaised += CardTempLeave;
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
-        _cardClicked.onEventRaised -= CardTempLeave;
-        InputManager.Instance.OnBackButtonPressed -= CardBackToHand;
+        InputManager.Instance.OnBackButtonPressed -= SelectionManager.Instance.DeselectCard;
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
@@ -79,15 +69,16 @@ public class HandManager : GenericSingleton<HandManager>
         _viewToUsePoint = GameObject.FindWithTag("ViewToUse").transform;
         _fpCamera = GameObject.FindWithTag("FPCamera").transform.GetComponent<CinemachineCamera>();
         CurrentHandState = HandState.InHand; // change
-        InputManager.Instance.OnBackButtonPressed += CardBackToHand;
+        InputManager.Instance.OnBackButtonPressed += SelectionManager.Instance.DeselectCard;
     }
 
-    public void DrawCard(GameObject newCard)
+    public bool DrawCard(GameObject newCard)
     {
-        if(_handCards.Count >= maxHandSize) return;
-        //GameObject newCard = Instantiate(cardPrefab, spawnPoint.position, spawnPoint.rotation);
+        if(_handCards.Count >= maxHandSize) return false;
         _handCards.Add(newCard);
+        newCard.GetComponent<Card>().SetHoverable(false);
         UpdateCardPosition();
+        return true;
     }
 
     private void UpdateCardPosition()
@@ -102,22 +93,21 @@ public class HandManager : GenericSingleton<HandManager>
             // last card (highest index) is closest to camera
             position -= _fpCamera.transform.forward * (i * 0.01f);
 
-            Quaternion rotation = Quaternion.Euler(-90f, 180f, 0f);
-
             Card card = _handCards[i].GetComponent<Card>();
             card._basePosition = position;
-            card._baseRotation = rotation;
+            card._baseRotation = _handPosition.rotation;
 
             _handCards[i].transform.DOKill();
-            _handCards[i].transform.DOMove(position, 0.25f);
-            _handCards[i].transform.DORotateQuaternion(CardRotations._cardFacePlayerVertical, 0.25f);
+            _handCards[i].transform.DOMove(position, 0.25f).OnComplete(() => card.SetHoverable(true));
+            _handCards[i].transform.DORotateQuaternion(_handPosition.rotation, 0.25f);
+
+            
         }
     }
 
     private void HandleCardHover()
     {
-        Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.MouseScreenPosition);
-        if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, _cardLayer))
+        if(Physics.Raycast(_mousePosition.GetMouseRay(), out RaycastHit hit, Mathf.Infinity, _cardLayer))
         {
             GameObject hitCard = hit.collider.transform.root.gameObject; // handCards contains the root gameObject of the card prefab, so we need to get the root of the hit collider
 
@@ -161,63 +151,50 @@ public class HandManager : GenericSingleton<HandManager>
         _handCards.Clear();
     }
 
-    private void CardTempLeave(Card card)
+    public void CardTempLeave(Card card)
     {
-        Debug.Log("Num of cards in hand before playing: " + _handCards.Count);
         _allowCardHover = false;
-        _currentSelectedCard = card;
         _handCards.Remove(card.gameObject);
 
         SwitchHandState(HandState.Selected);
-        _currentSelectedCard.transform.DOMove(_viewToUsePoint.position, 0.3f);
-        _currentSelectedCard.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f);
+        card.transform.DOKill();
+        card.transform.DOMove(_viewToUsePoint.position, 0.3f);
+        card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f);
     }
 
-    private void CardBackToHand()
+    public void CardBackToHand(Card card)
     {
-        if (_currentSelectedCard == null) return;
+        _handCards.Add(card.gameObject);
 
-        _handCards.Add(_currentSelectedCard.gameObject);
+        card.transform.DOKill();
 
-        _currentSelectedCard.transform.DOKill();
+        card.transform.DORotateQuaternion(card._baseRotation, 0.25f);
 
-        Quaternion rotation = _currentSelectedCard.GetComponent<Card>()._baseRotation;
-        _currentSelectedCard.transform.DORotateQuaternion(rotation, 0.25f);
-
-        _currentSelectedCard = null;
         _allowCardHover = true;
 
         SwitchHandState(HandState.InHand);
-
-        _cardUnselected.RaiseEvent(CameraState.FPCamera);
 
         UpdateCardPosition();
     }
 
     public void PlayCurrentCard(CardDropArea targetArea)
     {
-        if (_currentSelectedCard == null || targetArea.SlotOwner != Owner.Player) return;
+        if (targetArea.SlotOwner != Owner.Player) return;
 
-        Card playedCard = _currentSelectedCard;
-        _currentSelectedCard = null;
+        Card playedCard = SelectionManager.Instance.SelectedHandCard;
+        SelectionManager.Instance.CardPlayedDeselect();
+        if (playedCard == null) return;
 
         playedCard.transform.DOKill();
         playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
         {
             playedCard.CardIsPlayed();
-            targetArea.OnCardDrop(playedCard);
+            targetArea.OnCardDrop(playedCard); 
             _allowCardHover = true;
         });
 
         SwitchHandState(HandState.InHand);
-        _cardUnselected.RaiseEvent(CameraState.FPCamera);
-        _cardPlayed.RaiseEvent(CurrentHandState);
         UpdateCardPosition();
-    }
-
-    private void OnHandFocus()
-    {
-        // this should be called when we press an input, like a button or something
     }
 
     public void SwitchHandState(HandState state)

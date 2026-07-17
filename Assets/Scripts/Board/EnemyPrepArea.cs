@@ -9,9 +9,9 @@ public class EnemyPrepArea : MonoBehaviour, ICardDropArea
     public Transform _cardSpawnLocation;
 
     public bool HasCard => _currentCard != null;
-    private Card _currentCard;
+    public CardDropArea FrontCardDropArea => _frontCardDropArea;
 
-    public event Action<Card, LaneView, Action> pushedCard;
+    private Card _currentCard;
 
     private void Start()
     {
@@ -27,11 +27,11 @@ public class EnemyPrepArea : MonoBehaviour, ICardDropArea
     {
 
     }
-    public void TriggerPush(Action onCompleteCallback)
+    public Card TriggerPush()
     {
-        if (_currentCard == null) return;
+        if (_currentCard == null) return null;
         Card cardToPlay = _currentCard;
         _currentCard = null;
-        pushedCard?.Invoke(cardToPlay, _parentLaneView, onCompleteCallback);
+        return cardToPlay;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class CardUI : MonoBehaviour
 {
     private Card _card;
+
     [Header("UI")]
     [SerializeField] private TMP_Text _cardHealthText;
 

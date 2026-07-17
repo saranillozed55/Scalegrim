@@ -6,12 +6,14 @@ public class PlainCardData
 {
 
     public int _health;
-    public int _damage;
-    public bool isDead;
-    public PlainCardData(int health, int damage)
+    public int _attackDamage;
+    public int _cost;
+    public bool isDead = false;
+    public PlainCardData(int health, int damage, int cost)
     {
-        this._health = health;
-        this._damage = damage;
+        _health = health;
+        _attackDamage = damage;
+        _cost = cost;
     }
 
 }

@@ -9,19 +9,19 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
 {
     [field: SerializeField] public Owner SlotOwner { get; private set; } // this is set in the insepctor
 
-    [Range(0,2)]
-    [SerializeField] private int laneIndex; // Define 0 through 2 inside the unity inspector
+    [Range(0,3)]
+    [SerializeField] private int laneIndex; // Define 0 through 3 inside the unity inspector
 
 
-    private bool IsFull()
+    public bool IsFull()
     {
         if(SlotOwner == Owner.Player)
         {
-            return BoardLaneManager.Instance.logicLanes[laneIndex].IsPlayerSideOccupied;
+            return BoardLaneManager.Instance.LogicLanes[laneIndex].IsPlayerSideOccupied;
         }
         else
         {
-            return BoardLaneManager.Instance.logicLanes[laneIndex].IsEnemySideOccupied;
+            return BoardLaneManager.Instance.LogicLanes[laneIndex].IsEnemySideOccupied;
         }
     }
 
@@ -47,7 +47,7 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
 
     public void OnClick()
     {
-        if (HandManager.Instance.CurrentSelectedCard != null && HandManager.Instance.CurrentHandState == HandState.Selected && !IsFull() && SlotOwner == Owner.Player)
+        if (SelectionManager.Instance.SelectedHandCard != null && !IsFull() && SlotOwner == Owner.Player)
         {
             HandManager.Instance.PlayCurrentCard(this);
         }

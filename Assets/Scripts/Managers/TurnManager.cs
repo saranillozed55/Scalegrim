@@ -35,13 +35,12 @@ public class TurnManager : GenericSingleton<TurnManager>
         {
             CurrentTurnState = TurnState.EnemyTurn;
             _onEndTurnCam.RaiseEvent(CameraState.BoardCamera);
-            Debug.Log("Switch state to: " + CurrentTurnState);
         }
         else
         {
             CurrentTurnState = TurnState.PlayerTurn;
             _onEndTurnCam.RaiseEvent(CameraState.FPCamera);
-            Debug.Log("Switch state to: " + CurrentTurnState);
+
         }
     }
 }

@@ -35,31 +35,28 @@ public class CombatManager : GenericSingleton<CombatManager>
     {
         if (IsInCombat) return;
 
-        Debug.Log("Cards should be attacking");
-
         IsInCombat = true;
+        
         //player cards move
-        foreach (Lane lane in BoardLaneManager.Instance.logicLanes)
+        foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
         {
-            if (lane.PlayerActiveCard != null)
+            if (lane.PlayerActiveCard != null && !lane.PlayerActiveCard._cardData.isDead)
             {
                 await lane.PlayerActiveCard.PlayCardAttackAsync(Vector3.forward, lane.EnemyActiveCard); // Update parameter
-                //_invoker.EnqueueCommand(new CardAttackCommand(lane.PlayerActiveCard, lane)); 
             }
         }
 
         //enemy cards move
-        foreach (Lane lane in BoardLaneManager.Instance.logicLanes)
+        foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
         {
-            if (lane.EnemyActiveCard != null)
+            if (lane.EnemyActiveCard != null && !lane.EnemyActiveCard._cardData.isDead)
             {
                 await lane.EnemyActiveCard.PlayCardAttackAsync(Vector3.back, lane.PlayerActiveCard);
-                //_invoker.EnqueueCommand(new CardAttackCommand(lane.EnemyActiveCard, lane));
             }
         }
-
         EndCombat();
     }
+
     public void EndCombat()
     {
         IsInCombat = false;

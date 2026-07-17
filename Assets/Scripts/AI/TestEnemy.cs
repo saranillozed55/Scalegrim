@@ -1,8 +1,16 @@
 using DG.Tweening;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Unity.Multiplayer.PlayMode;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.InputSystem;
+
+public enum CardPreference
+{
+    OVERPOWER,
+    TANK,
+}
 
 public class TestEnemy : MonoBehaviour
 {
@@ -11,53 +19,109 @@ public class TestEnemy : MonoBehaviour
 
     [SerializeField] private List<EnemyPrepArea> _prepArea;
 
-    private List<Card> _enemyHand = new();
+    [SerializeField] private List<Card> _enemyDeck = new();
 
-    private UtilityAI _utilityAI = new UtilityAI();
+    [Header("Listener to Event Channels")]
+    [SerializeField] private VoidEventChannel _onEnemyEndTurn;
+
+    [Header("Settings for Next Card Moves")]
+    [SerializeField] private float DAMAGE_THRESHOLD = 5f;
+
+    [Header("AI profile")]
+    [SerializeField] private AIPersonality _aiProfile;
+
+    BoardEvaluater eval = new BoardEvaluater();
+    CardPlacer cardPlacer = new CardPlacer();
+    CardRetriever cardRetriever;
+
+    private void OnEnable()
+    {
+        _onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
+    }
+
+    private void OnDisable()
+    {
+        _onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
+    }
 
     private void Start()
     {
-        InitalizeEnemyDeck();
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 0);
-        //BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 1);
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 2);
+        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 0, out bool full1);
+        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 2, out bool full2);
+
+        cardRetriever = new CardRetriever(_enemyDeck);
+    }
+    private BoardState CheckCurrentBoardState()
+    {
+        BoardState currState = BoardLaneManager.Instance.CaptureBoardState();
+
+        for (int i = 0; i < currState.Lanes.Count; i++)
+        {
+            Debug.Log($" LaneIndex {i + 1}, EnemyQueuedCard: {currState.Lanes[i].EnemyQueuedCard}, EnemyCard: {currState.Lanes[i].EnemyCard},  PlayerCard: {currState.Lanes[i].PlayerCard}");
+        }
+        return currState;
     }
 
-    private void InitalizeEnemyDeck()
+    private void QueueNextCardInLane()
     {
-        _enemyHand.Clear();
-        for (int i = 0; i < _maxCards; i++)
+        List<LaneSnapShot> lanes = CheckCurrentBoardState().Lanes;
+
+        foreach (LaneSnapShot lane in lanes) // O(n) since only have max 4 lanes
         {
-            _enemyHand.Add(_cardPrefab);
+            //float score = EvaluateLane(lane);
+            float score = eval.EvaluateLane(_aiProfile, lane);
+
+            if (score >= 15)
+            {
+                Debug.Log($"<color=yellow> Lane {lane.LaneIndex + 1} has a score of {score} >= 15. Queuing strongest card available in this lane.</color>");
+
+                Card currentStrongestCard = null;
+                Card retrievedCard = cardRetriever.RetrieveCard(_aiProfile, lane);
+                currentStrongestCard = retrievedCard;
+
+                if (currentStrongestCard != null)
+                {
+                    //HandlePlaceCard(currentStrongestCard, lane.LaneIndex);
+                    cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
+                }
+                continue;
+            }
+
+            else if (score > DAMAGE_THRESHOLD)
+            {
+                Debug.Log($"<color=yellow>Lane {lane.LaneIndex + 1} has a score of {score}. Queueing next card in this lane.</color>");
+
+                foreach (Card card in _enemyDeck)
+                {
+                    if (card == null)
+                    {
+                        Debug.LogWarning($"Card that is being accessed is null");
+                        continue;
+                    }
+                    if (lane.PlayerCard.HasValue && (card.BaseHealth > lane.PlayerCard.Value.Attack))
+                    {
+                        Debug.Log($"<color=cyan> This Card '{card.name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
+
+                        //HandlePlaceCard(card, lane.LaneIndex);
+                        cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
+                        break;
+                    }
+                    else if (!lane.PlayerCard.HasValue)
+                    {
+                        Debug.Log($"<color=cyan> There is no Player Card in this lane {lane.LaneIndex + 1}.</color>");
+                        break;
+                    }
+                    else
+                    {
+                        Debug.Log($"<color=cyan> This card '{card.name}' can't survive player attack");
+                    }
+                }
+            }
+
+            else
+            {
+                Debug.Log($"<color=white>Lane {lane.LaneIndex + 1} has a score of {score}. Not queueing next card in this lane.</color>");
+            }
         }
     }
-    private void Update()
-    {
-        if (Keyboard.current.pKey.wasPressedThisFrame)
-        {
-            BoardLaneManager.Instance.AdvanceEnemyCardsFromQueue();
-        }
-    }
-
-    //Might want this to be like PlayEnemyStartingHand instead and place it in BoardLaneManger
-    //private void PlayStartingHand(List<Card> cards, int laneIndex) // We want parameters for this later on because we want to determine which lane we want to put it in and 
-    //{
-    //    for (int i = 0; i < _prepArea.Count; i++)
-    //    {
-    //        int localIndex = i;
-    //        GameObject instance = Instantiate(_enemyHand[i].gameObject, _prepArea[i]._cardSpawnLocation.position, _prepArea[i]._cardSpawnLocation.rotation);
-    //        Card cardInstance = instance.GetComponent<Card>();
-
-    //        // can add delay when this work
-    //        // have to check if a card is already there. Can be done in Utility AI I believe. This is just a test code
-    //        Vector3 position = _prepArea[i].transform.position;
-
-    //        instance.transform.DOKill();
-    //        instance.transform.DOMove(position, 0.3f);//delay here
-    //        instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f).OnComplete(() =>
-    //        {
-    //            _prepArea[localIndex].SetCardInArea(cardInstance);
-    //        });
-    //    }
-    //}
 }

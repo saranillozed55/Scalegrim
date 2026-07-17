@@ -15,6 +15,8 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     private Stack<GameObject> _deckCards = new();
 
+    private bool _isPopping = false;
+
     private void Start()
     {
         _playerDeckStackPosition = GetComponent<Transform>();
@@ -51,8 +53,21 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     public void OnClick()
     {
+        if (_isPopping) return;
+        if (_deckCards.Count == 0) return;
+
+        _isPopping = true;
+
         GameObject poppedCard = _deckCards.Pop();
-        HandManager.Instance.DrawCard(poppedCard);
+        bool drawn = HandManager.Instance.DrawCard(poppedCard);
+
+        if(!drawn)
+        {
+            _deckCards.Push(poppedCard);
+        }
+
+        //small delay matching draw tween so that we don't double click and it pops twice
+        DOVirtual.DelayedCall(0.15f, () => _isPopping = false);
     }
 
     public void ClearDeckStack()

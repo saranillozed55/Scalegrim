@@ -1,23 +1,24 @@
 using DG.Tweening;
 using NUnit.Framework;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Analytics;
+using System;
 
 public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
-    public List<Lane> logicLanes = new List<Lane>();
-
+    private List<Lane> logicLanes = new List<Lane>();
 
     [Header("Broadcast to EventChannels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
 
     [Header("Listener to EventChannels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
+
+    public List<Lane> LogicLanes => logicLanes;
 
     protected override void Awake()
     {
@@ -28,18 +29,10 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     private void OnEnable()
     {
         _onPlayerEndTurn.onEventRaised += AdvanceEnemyCardsFromQueue;
-        foreach (LaneView view in physicalLanes)
-        {
-            view.EnemyPrepArea.pushedCard += OnPrepAreaPushedCard;
-        }
     }
     private void OnDisable()
     {
         _onPlayerEndTurn.onEventRaised -= AdvanceEnemyCardsFromQueue;
-        foreach (LaneView view in physicalLanes)
-        {
-            view.EnemyPrepArea.pushedCard -= OnPrepAreaPushedCard;
-        }
     }
 
     private void InitializeBoard()
@@ -51,20 +44,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             Lane dataLane = new Lane { LaneIndex = view.laneIndex };
             logicLanes.Add(dataLane);
         }
-    }
-    private void OnPrepAreaPushedCard(Card card, LaneView view, System.Action onComplete)
-    {
-        Lane matchingDataLane = null;
-        foreach (Lane dataLane in logicLanes)
-        {
-            if (dataLane.LaneIndex == view.laneIndex)
-            {
-                matchingDataLane = dataLane;
-                break;
-            }
-        }
-        if (matchingDataLane == null || view == null) return;
-        HandleCardAdvance(matchingDataLane, view, card, onComplete);
     }
 
     public void PlaceCardInLane(Card card, int laneIndex, Owner slotOwner)
@@ -78,14 +57,20 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         {
             updatedLane.PlayerActiveCard = card;
         }
-        Debug.Log("Card: " + card + " Lane index: " + laneIndex + "Slot Owner: " + slotOwner);
+        Debug.Log($"<color=#4FC3F7>[Card]</color> {card.name} → Lane {laneIndex}, Owner {slotOwner}", card);
         logicLanes[laneIndex] = updatedLane;
     }
 
-    public void PlaceEnemyCardsInQueue(Card cardPrefab, int laneIndex)
+    public void PlaceEnemyCardsInQueue(Card cardPrefab, int laneIndex, out bool full)
     {
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
+        if (targetPrepArea != null && !targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
+        {
+            full = true;
+            return;
+        }
 
+        full = false;
         GameObject instance = Instantiate(cardPrefab.gameObject, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
 
         Card cardInstance = instance.GetComponent<Card>();
@@ -98,51 +83,105 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f).OnComplete(() => targetPrepArea.OnCardDrop(cardInstance));
     }
 
-    public void AdvanceEnemyCardsFromQueue()
+    public async void AdvanceEnemyCardsFromQueue()
     {
-        int movingCardsCount = 0;
+        //list of all awaitable animations so we can wait for them
+        List<Awaitable> animationTasks = new List<Awaitable>();
         foreach (LaneView lane in physicalLanes)
         {
-            if (lane.EnemyPrepArea.HasCard)
+            if (lane.EnemyPrepArea.HasCard && lane.EnemyActiveArea.IsFull())
             {
-                movingCardsCount++;
+                Debug.Log("There is already a card infront of this lane, cannot advance queued card");
+                continue;
+            }
+            if (!lane.EnemyPrepArea.HasCard) continue;
+
+            //pop card out of the prep area directly
+            Card card = lane.EnemyPrepArea.TriggerPush();
+
+            if (card != null)
+            {
+                Lane matchingDataLane = logicLanes.FirstOrDefault(l => l.LaneIndex == lane.laneIndex);
+                if (matchingDataLane != null)
+                {
+                    //start async animation and add to list
+                    animationTasks.Add(HandleCardAdvanceAsync(matchingDataLane, lane, card));
+                }
             }
         }
-        if (movingCardsCount == 0)
+
+        if (animationTasks.Count == 0)
         {
             _onCombatStart.RaiseEvent();
             return;
         }
-        foreach (LaneView lane in physicalLanes)
-        {
-            if (!lane.EnemyPrepArea.HasCard) continue;
 
-            lane.EnemyPrepArea.TriggerPush(() =>
-            {
-                movingCardsCount--;
-                if (movingCardsCount == 0)
-                {
-                    _onCombatStart.RaiseEvent();
-                }
-            });
+        //wait for all animations to finish in the list
+        foreach (Awaitable anim in animationTasks)
+        {
+            await anim;
+        }
+
+        _onCombatStart.RaiseEvent();
+    }
+
+    private async Awaitable HandleCardAdvanceAsync(Lane dataLane, LaneView view, Card card)
+    {
+        try
+        {
+            dataLane.EnemyActiveCard = card;
+            dataLane.EnemyQueuedCard = null;
+
+            card.transform.DOKill();
+            Transform targetLocation = view.EnemyActiveArea.transform;
+            Quaternion targetRotation = CardRotations._cardFaceFlatUp; // WANT TO CHANGE THIS LATER TO MIMIC INSCRYPTION MAYBE
+
+            Sequence animSequence = DOTween.Sequence();
+
+            animSequence.Join(card.transform.DOMove(targetLocation.position, 0.3f).SetEase(Ease.OutQuad));
+            animSequence.Join(card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f));
+
+            await animSequence.AsyncWaitForCompletion();
+
+            view.EnemyActiveArea.OnCardDrop(card);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error in HandleCardAdvanceAsync: {ex.Message}");
         }
     }
 
-    private void HandleCardAdvance(Lane dataLane, LaneView view, Card card, System.Action onCompleteCallback)
+    public BoardState CaptureBoardState()
     {
-        dataLane.EnemyActiveCard = card;
-        dataLane.EnemyQueuedCard = null;
-
-        Transform targetTransform = view.EnemyActiveArea.transform;
-        Quaternion targetRotation = CardRotations._cardFaceFlatUp;
-
-        card.transform.DOKill();
-        card.transform.DOMove(targetTransform.position, 0.3f);
-        card.transform.DORotateQuaternion(targetRotation, 0.3f).OnComplete(() =>
+        BoardState state = new BoardState()
         {
-            view.EnemyActiveArea.OnCardDrop(card);
+            Lanes = new List<LaneSnapShot>()
+        };
 
-            onCompleteCallback?.Invoke();
-        });
+        foreach(var lane in logicLanes)
+        {
+            LaneSnapShot snapShot = new LaneSnapShot
+            {
+                LaneIndex = lane.LaneIndex,
+                EnemyCard = ToSnapShot(lane.EnemyActiveCard),
+                PlayerCard = ToSnapShot(lane.PlayerActiveCard),
+                EnemyQueuedCard = ToSnapShot(lane.EnemyQueuedCard)
+            };
+            state.Lanes.Add(snapShot);
+        }
+
+        return state;
+    }
+
+    public CardSnapShot? ToSnapShot(Card card)
+    {
+        if (card == null) return null;
+
+        return new CardSnapShot
+        {
+            CardName = card.name,
+            Attack = card.BaseDamage,
+            Health = card.BaseHealth,
+        };
     }
 }

@@ -1,0 +1,30 @@
+:root {
+}
+
+.button {
+    transition-duration: 0.15s;
+    -unity-font-definition: url("project://database/Assets/Fonts/edo/edo.ttf?fileID=12800000&guid=6731d5cd2ac1bab4eb8b39fb056c197e&type=3#edo");
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    align-items: stretch;
+    width: 538px;
+    height: 99px;
+    left: 700px;
+    font-size: 42px;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 14px;
+    margin-bottom: 95px;
+    position: absolute;
+    top: 210px;
+    background-color: rgba(0, 0, 0, 0);
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+}
+
+.button:hover {
+    scale: 1.1 1.1 1.1;
+    rotate: 10deg;
+}
