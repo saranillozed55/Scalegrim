@@ -115,7 +115,7 @@ public class Card : MonoBehaviour, IHoverable, IClickable
     {
         if (_cardIsSelected || _cardIsPlaced || !_hoverable) return;
 
-        SelectionManager.Instance.OnCardClicked(this);
+        //SelectionManager.Instance.OnCardClicked(this);
     }
 
     //<REFACTOR> -- Move this to somewhere else because we want the damage to be done on a different scripts. More cleaner
@@ -130,11 +130,7 @@ public class Card : MonoBehaviour, IHoverable, IClickable
 
             await transform.DOMove(_placedPosition + attackDirection * 0.3f, 0.15f).SetEase(Ease.OutQuad).AsyncWaitForCompletion(); // must have await because DOTween runs async in the background so must call await
 
-            //Damage here as well - may want to change this damaging system to use manager instead
-            //ApplyDamage(oppositeCard);
-
-            CardsDamager cardDamager = new(this, oppositeCard);
-            cardDamager.ApplyDamage();
+            //CardsDamager.ApplyDamage(this, oppositeCard); // this will change in CardView 
 
             await transform.DOMove(_placedPosition, 0.15f).SetEase(Ease.InQuad).AsyncWaitForCompletion();
         }
@@ -143,10 +139,6 @@ public class Card : MonoBehaviour, IHoverable, IClickable
             Debug.LogWarning("Card action stopped because the card was removed: " + ex.Message);
             transform.DOKill();
         }
-        //finally
-        //{
-        //    _cardIsAttacking = false;
-        //}
     }
 
     private async Awaitable CardDeathAsync()

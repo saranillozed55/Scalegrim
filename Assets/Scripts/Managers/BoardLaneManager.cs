@@ -46,7 +46,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         }
     }
 
-    public void PlaceCardInLane(Card card, int laneIndex, Owner slotOwner)
+    public void PlaceCardInLane(CardModel card, int laneIndex, Owner slotOwner)
     {
         Lane updatedLane = logicLanes[laneIndex];
         if (slotOwner == Owner.Enemy)
@@ -57,11 +57,11 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         {
             updatedLane.PlayerActiveCard = card;
         }
-        Debug.Log($"<color=#4FC3F7>[Card]</color> {card.name} → Lane {laneIndex}, Owner {slotOwner}", card);
+        Debug.Log($"<color=#4FC3F7>[Card]</color> {card.Name} → Lane {laneIndex}, Owner {slotOwner}");
         logicLanes[laneIndex] = updatedLane;
     }
 
-    public void PlaceEnemyCardsInQueue(Card cardPrefab, int laneIndex, out bool full)
+    public void PlaceEnemyCardsInQueue(CardView cardViewPrefab, int laneIndex, out bool full)
     {
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
         if (targetPrepArea != null && !targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
@@ -71,11 +71,12 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         }
 
         full = false;
-        GameObject instance = Instantiate(cardPrefab.gameObject, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
+        GameObject instance = Instantiate(cardViewPrefab.gameObject, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
 
-        Card cardInstance = instance.GetComponent<Card>();
-        cardInstance.CardIsPlayed();
-        logicLanes[laneIndex].EnemyQueuedCard = cardInstance;
+        CardView cardInstance = instance.GetComponent<CardView>();
+        cardInstance.CardModel.PlayCard();
+
+        logicLanes[laneIndex].EnemyQueuedCard = cardInstance.CardModel;
         Vector3 targetPosition = targetPrepArea.transform.position;
 
         instance.transform.DOKill();
@@ -97,7 +98,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             if (!lane.EnemyPrepArea.HasCard) continue;
 
             //pop card out of the prep area directly
-            Card card = lane.EnemyPrepArea.TriggerPush();
+            CardView card = lane.EnemyPrepArea.TriggerPush();
 
             if (card != null)
             {
@@ -125,11 +126,11 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         _onCombatStart.RaiseEvent();
     }
 
-    private async Awaitable HandleCardAdvanceAsync(Lane dataLane, LaneView view, Card card)
+    private async Awaitable HandleCardAdvanceAsync(Lane dataLane, LaneView view, CardView card)
     {
         try
         {
-            dataLane.EnemyActiveCard = card;
+            dataLane.EnemyActiveCard = card.CardModel;
             dataLane.EnemyQueuedCard = null;
 
             card.transform.DOKill();
@@ -173,15 +174,15 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         return state;
     }
 
-    public CardSnapShot? ToSnapShot(Card card)
+    public CardSnapShot? ToSnapShot(CardModel card)
     {
         if (card == null) return null;
 
         return new CardSnapShot
         {
-            CardName = card.name,
-            Attack = card.BaseDamage,
-            Health = card.BaseHealth,
+            CardName = card.Name,
+            Attack = card.AttackDamage,
+            Health = card.Health,
         };
     }
 }

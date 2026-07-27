@@ -1,39 +1,44 @@
 using UnityEngine;
 
-public class CardsDamager
+public static class CardsDamager
 {
+    //public static void ApplyDamage(Card attackingCard, Card targetCard)
+    //{
+    //    if (targetCard == null)
+    //    {
+    //        Debug.Log("This should damage enemy/person");
+    //        return;
+    //    }
+    //    else
+    //    {
+    //        targetCard._cardData._health -= attackingCard._cardData._attackDamage;
+    //        CheckCardDeath(targetCard);
 
-    private Card attackingCard;
-    private Card targetCard;
+    //        Debug.Log($"Damage done to target card {attackingCard.DamageCurrent}, Opposite Card Health: {targetCard.HealthCurrent}");
+    //    }
+    //}
 
-    public CardsDamager(Card attackingCard, Card targetCard)
+    public static void ApplyDamage(CardModel attackingCard, CardModel defendingCard)
     {
-        this.attackingCard = attackingCard;
-        this.targetCard = targetCard;
-    }
-
-    public void ApplyDamage()
-    {
-        if (targetCard == null)
+        if (defendingCard == null)
         {
             Debug.Log("This should damage enemy/person");
             return;
         }
         else
         {
-            targetCard._cardData._health -= attackingCard._cardData._attackDamage;
-            CheckCardDeath();
+            defendingCard.Health -= attackingCard.AttackDamage;
+            CheckCardDeath(defendingCard);
 
-            Debug.Log($"Damage done to target card {attackingCard.DamageCurrent}, Opposite Card Health: {targetCard.HealthCurrent}");
+            Debug.Log($"Damage done to target card {attackingCard.AttackDamage}, Opposite Card Health after Damage: {defendingCard.Health}");
         }
     }
 
-    private void CheckCardDeath()
+    private static void CheckCardDeath(CardModel defendingCard)
     {
-        if(targetCard._cardIsPlaced && targetCard.HealthCurrent <= 0 && !targetCard.IsCardDead)
+        if(defendingCard.CardPlaced && defendingCard.Health <= 0 && !defendingCard.Dead)
         {
-            targetCard.IsCardDead = true;
-            GameObject.Destroy(targetCard.gameObject);
+            defendingCard.Dead = true;
         }
     }
 }

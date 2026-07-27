@@ -25,13 +25,12 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
         }
     }
 
-    public void OnCardDrop(Card playedCard)
+    public void OnCardDrop(CardView playedCard)
     {
-        Card card = playedCard;
-        if(card != null)
+        if(playedCard != null)
         {
-            BoardLaneManager.Instance.PlaceCardInLane(card, laneIndex, SlotOwner);
-            card._placedPosition = transform.position;
+            BoardLaneManager.Instance.PlaceCardInLane(playedCard.CardModel, laneIndex, SlotOwner);
+            playedCard.SetBasePosition(transform.position);
         }
         else
         {

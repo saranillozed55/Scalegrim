@@ -2,15 +2,13 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Can have ScriptableObject for PlayerDeck maybe ? not sure yet
 public class PlayerDeck : MonoBehaviour
 {
-    [SerializeField] private Card _tempCardPrefab;
     [SerializeField] private int _maxStack = 5;
-    private List<Card> _deck = new();
-    public List<Card> _startingDeck = new(); // Use inspector
+    private List<CardModel> _deck = new();
+    public List<CardModel> _startingDeck = new(); 
 
-    public List<Card> Deck => _deck;
+    public List<CardModel> Deck => _deck;
 
     private void Start()
     {
@@ -27,11 +25,10 @@ public class PlayerDeck : MonoBehaviour
         for (int i = 0; i < _maxStack; i++)
         {
             _deck.Add(_startingDeck[i]);
-            //Debug.Log("Added card: " + _tempCardPrefab.name);
         }
     }
 
-    public void AddToPlayerDeck(Card card)
+    public void AddToPlayerDeck(CardModel card)
     {
         if(card != null)
         {
@@ -39,7 +36,7 @@ public class PlayerDeck : MonoBehaviour
         }
     }
 
-    public void RemoveToPlayerDeck(Card card)
+    public void RemoveToPlayerDeck(CardModel card)
     {
         if(_deck.Contains(card))
         {

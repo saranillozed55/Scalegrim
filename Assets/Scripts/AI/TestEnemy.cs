@@ -15,11 +15,10 @@ public enum CardPreference
 public class TestEnemy : MonoBehaviour
 {
     [SerializeField] private int _maxCards = 5; // enemy shouldnt have _maxCards unless we want it to
-    [SerializeField] private Card _cardPrefab;
 
     [SerializeField] private List<EnemyPrepArea> _prepArea;
 
-    [SerializeField] private List<Card> _enemyDeck = new();
+    [SerializeField] private List<CardModel> _enemyDeck = new();
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
@@ -46,9 +45,6 @@ public class TestEnemy : MonoBehaviour
 
     private void Start()
     {
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 0, out bool full1);
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(_cardPrefab, 2, out bool full2);
-
         cardRetriever = new CardRetriever(_enemyDeck);
     }
     private BoardState CheckCurrentBoardState()
@@ -75,8 +71,8 @@ public class TestEnemy : MonoBehaviour
             {
                 Debug.Log($"<color=yellow> Lane {lane.LaneIndex + 1} has a score of {score} >= 15. Queuing strongest card available in this lane.</color>");
 
-                Card currentStrongestCard = null;
-                Card retrievedCard = cardRetriever.RetrieveCard(_aiProfile, lane);
+                CardModel currentStrongestCard = null;
+                CardModel retrievedCard = cardRetriever.RetrieveCard(_aiProfile, lane);
                 currentStrongestCard = retrievedCard;
 
                 if (currentStrongestCard != null)
@@ -91,16 +87,16 @@ public class TestEnemy : MonoBehaviour
             {
                 Debug.Log($"<color=yellow>Lane {lane.LaneIndex + 1} has a score of {score}. Queueing next card in this lane.</color>");
 
-                foreach (Card card in _enemyDeck)
+                foreach (CardModel card in _enemyDeck)
                 {
                     if (card == null)
                     {
                         Debug.LogWarning($"Card that is being accessed is null");
                         continue;
                     }
-                    if (lane.PlayerCard.HasValue && (card.BaseHealth > lane.PlayerCard.Value.Attack))
+                    if (lane.PlayerCard.HasValue && (card.Health > lane.PlayerCard.Value.Attack))
                     {
-                        Debug.Log($"<color=cyan> This Card '{card.name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
+                        Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
 
                         //HandlePlaceCard(card, lane.LaneIndex);
                         cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
@@ -113,7 +109,7 @@ public class TestEnemy : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log($"<color=cyan> This card '{card.name}' can't survive player attack");
+                        Debug.Log($"<color=cyan> This card '{card.Name}' can't survive player attack");
                     }
                 }
             }

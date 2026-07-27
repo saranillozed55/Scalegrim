@@ -3,9 +3,9 @@ using UnityEngine;
 public class SelectionManager : GenericSingleton<SelectionManager>
 {
 
-    public Card SelectedHandCard { get; private set; }
+    public CardView SelectedHandCard { get; private set; }
 
-    public void OnCardClicked(Card card)
+    public void OnCardClicked(CardView card)
     {
         //ignore if we don't want to click on cards while not player turn
         if(TurnManager.Instance.CurrentTurnState != TurnState.PlayerTurn)
@@ -22,7 +22,7 @@ public class SelectionManager : GenericSingleton<SelectionManager>
         SelectCard(card);
     }
 
-    private void SelectCard(Card card)
+    private void SelectCard(CardView card)
     {
         //Deselct previous card
         if (SelectedHandCard != null)

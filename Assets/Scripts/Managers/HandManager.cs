@@ -15,7 +15,7 @@ public class HandManager : GenericSingleton<HandManager>
     [Header("Settings")]
     [SerializeField] private int maxHandSize;
     [SerializeField] private LayerMask _cardLayer;
-    [SerializeField] private GameObject cardPrefab; // change this to specific card prefabs
+    [SerializeField] private CardView cardViewPrefab; // change this to specific card prefabs
     [SerializeField] private float cardOverlap = 0.15f;
 
     [Header("References")]
@@ -25,16 +25,17 @@ public class HandManager : GenericSingleton<HandManager>
     [SerializeField] private CinemachineCamera _fpCamera;
 
     private MousePosition _mousePosition;
-    
+
     private bool _allowCardHover = true;
-    private GameObject _currentHoveredCard;
-    private List<GameObject> _handCards = new();
+    private CardView _currentHoveredCard;
+    private List<CardView> _handCards = new();
 
     protected override void Awake()
     {
         base.Awake();
         _mousePosition = FindFirstObjectByType<MousePosition>();
     }
+
     private void Update()
     {
         if (Keyboard.current.dKey.wasPressedThisFrame)
@@ -72,11 +73,11 @@ public class HandManager : GenericSingleton<HandManager>
         InputManager.Instance.OnBackButtonPressed += SelectionManager.Instance.DeselectCard;
     }
 
-    public bool DrawCard(GameObject newCard)
+    public bool DrawCard(CardView newCard)
     {
-        if(_handCards.Count >= maxHandSize) return false;
+        if (_handCards.Count >= maxHandSize) return false;
         _handCards.Add(newCard);
-        newCard.GetComponent<Card>().SetHoverable(false);
+        newCard.CardModel.SetHoverable(false);
         UpdateCardPosition();
         return true;
     }
@@ -93,37 +94,37 @@ public class HandManager : GenericSingleton<HandManager>
             // last card (highest index) is closest to camera
             position -= _fpCamera.transform.forward * (i * 0.01f);
 
-            Card card = _handCards[i].GetComponent<Card>();
-            card._basePosition = position;
-            card._baseRotation = _handPosition.rotation;
+            CardView cardView = _handCards[i];
+            cardView.SetBasePosition(position);
+            cardView.SetBaseRotation(_handPosition.rotation);
 
-            _handCards[i].transform.DOKill();
-            _handCards[i].transform.DOMove(position, 0.25f).OnComplete(() => card.SetHoverable(true));
-            _handCards[i].transform.DORotateQuaternion(_handPosition.rotation, 0.25f);
-
-            
+            cardView.transform.DOKill();
+            cardView.transform.DOMove(position, 0.25f)
+                .OnComplete(() => cardView.CardModel.SetHoverable(true));
+            cardView.transform.DORotateQuaternion(_handPosition.rotation, 0.25f);
         }
     }
 
     private void HandleCardHover()
     {
-        if(Physics.Raycast(_mousePosition.GetMouseRay(), out RaycastHit hit, Mathf.Infinity, _cardLayer))
+        if (Physics.Raycast(_mousePosition.GetMouseRay(), out RaycastHit hit, Mathf.Infinity, _cardLayer))
         {
-            GameObject hitCard = hit.collider.transform.root.gameObject; // handCards contains the root gameObject of the card prefab, so we need to get the root of the hit collider
+            // handCards contains the root CardView of the card prefab, so get the root's component
+            CardView hitCard = hit.collider.transform.root.GetComponent<CardView>();
 
             if (hitCard == _currentHoveredCard)
             {
                 return; // Already hovering this card, do nothing
             }
-            if(_currentHoveredCard != null)
+            if (_currentHoveredCard != null)
             {
-                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverExit();
+                _currentHoveredCard.OnHoverExit();
             }
-            //Enter new, only if it's a card in hand
-            if(_handCards.Contains(hitCard))
+            // Enter new, only if it's a card in hand
+            if (hitCard != null && _handCards.Contains(hitCard))
             {
                 _currentHoveredCard = hitCard;
-                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverEnter();
+                _currentHoveredCard.OnHoverEnter();
             }
             else
             {
@@ -132,10 +133,10 @@ public class HandManager : GenericSingleton<HandManager>
         }
         else
         {
-            //ray cast hit nothing
-            if(_currentHoveredCard != null)
+            // raycast hit nothing
+            if (_currentHoveredCard != null)
             {
-                _currentHoveredCard.GetComponent<IHoverable>()?.OnHoverExit();
+                _currentHoveredCard.OnHoverExit();
                 _currentHoveredCard = null;
             }
         }
@@ -144,17 +145,17 @@ public class HandManager : GenericSingleton<HandManager>
     public void ClearCards()
     {
         if (_handCards == null || _handCards.Count == 0) return;
-        foreach(var card in _handCards)
+        foreach (var card in _handCards)
         {
-            Destroy(card);
+            Destroy(card.gameObject);
         }
         _handCards.Clear();
     }
 
-    public void CardTempLeave(Card card)
+    public void CardTempLeave(CardView card)
     {
         _allowCardHover = false;
-        _handCards.Remove(card.gameObject);
+        _handCards.Remove(card);
 
         SwitchHandState(HandState.Selected);
         card.transform.DOKill();
@@ -162,18 +163,16 @@ public class HandManager : GenericSingleton<HandManager>
         card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f);
     }
 
-    public void CardBackToHand(Card card)
+    public void CardBackToHand(CardView card)
     {
-        _handCards.Add(card.gameObject);
+        _handCards.Add(card);
 
         card.transform.DOKill();
-
-        card.transform.DORotateQuaternion(card._baseRotation, 0.25f);
+        card.transform.DORotateQuaternion(card.BaseRotation, 0.25f);
 
         _allowCardHover = true;
 
         SwitchHandState(HandState.InHand);
-
         UpdateCardPosition();
     }
 
@@ -181,15 +180,15 @@ public class HandManager : GenericSingleton<HandManager>
     {
         if (targetArea.SlotOwner != Owner.Player) return;
 
-        Card playedCard = SelectionManager.Instance.SelectedHandCard;
+        CardView playedCard = SelectionManager.Instance.SelectedHandCard;
         SelectionManager.Instance.CardPlayedDeselect();
         if (playedCard == null) return;
 
         playedCard.transform.DOKill();
         playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
         {
-            playedCard.CardIsPlayed();
-            targetArea.OnCardDrop(playedCard); 
+            playedCard.CardModel.PlayCard();
+            targetArea.OnCardDrop(playedCard);
             _allowCardHover = true;
         });
 
@@ -199,7 +198,7 @@ public class HandManager : GenericSingleton<HandManager>
 
     public void SwitchHandState(HandState state)
     {
-        if(CurrentHandState != state)
+        if (CurrentHandState != state)
         {
             CurrentHandState = state;
         }

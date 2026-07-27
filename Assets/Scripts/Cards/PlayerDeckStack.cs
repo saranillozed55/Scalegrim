@@ -12,8 +12,9 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
     [SerializeField] private float _gapSize = 0.02f;
     [SerializeField] private Transform _spawnLocation;
     [SerializeField] private PlayerDeck _playerDeck;
+    [SerializeField] private CardView _cardViewPrefab;
 
-    private Stack<GameObject> _deckCards = new();
+    private Stack<CardView> _deckCards = new();
 
     private bool _isPopping = false;
 
@@ -33,11 +34,11 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
             ClearDeckStack();
         }
     }
-    public void LoadDeck(List<Card> deckCards)
+    public void LoadDeck(List<CardModel> deckCards)
     {
         for (int i = 0; i < deckCards.Count; i++)
         {
-            GameObject instance = Instantiate(deckCards[i].gameObject, _spawnLocation.position, _spawnLocation.rotation);
+            CardView instance = Instantiate(_cardViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
 
             float delay = i * 0.08f;
             Vector3 position = _playerDeckStackPosition.position + (Vector3.up * _gapSize * i);
@@ -58,7 +59,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
         _isPopping = true;
 
-        GameObject poppedCard = _deckCards.Pop();
+        CardView poppedCard = _deckCards.Pop();
         bool drawn = HandManager.Instance.DrawCard(poppedCard);
 
         if(!drawn)
@@ -74,7 +75,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
     {
         if (_deckCards.Count > 0)
         {
-            foreach (GameObject card in _deckCards)
+            foreach (CardView card in _deckCards)
             {
                 Destroy(card);
             }

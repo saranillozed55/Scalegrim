@@ -40,18 +40,21 @@ public class CombatManager : GenericSingleton<CombatManager>
         //player cards move
         foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
         {
-            if (lane.PlayerActiveCard != null && !lane.PlayerActiveCard._cardData.isDead)
+            if (lane.PlayerActiveCard != null && !lane.PlayerActiveCard.Dead)
             {
-                await lane.PlayerActiveCard.PlayCardAttackAsync(Vector3.forward, lane.EnemyActiveCard); // Update parameter
+                CardView view = CardView.GetView(lane.PlayerActiveCard);
+                if (view != null) await view.CardAttackAsync(lane.PlayerActiveCard, lane.EnemyActiveCard);
             }
         }
 
         //enemy cards move
         foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
         {
-            if (lane.EnemyActiveCard != null && !lane.EnemyActiveCard._cardData.isDead)
+            if (lane.EnemyActiveCard != null && !lane.EnemyActiveCard.Dead)
             {
-                await lane.EnemyActiveCard.PlayCardAttackAsync(Vector3.back, lane.PlayerActiveCard);
+                CardView view = CardView.GetView(lane.EnemyQueuedCard);
+                if (view != null) await view.CardAttackAsync(lane.EnemyActiveCard, lane.PlayerActiveCard);
+
             }
         }
         EndCombat();

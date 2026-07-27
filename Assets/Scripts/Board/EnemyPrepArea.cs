@@ -11,14 +11,14 @@ public class EnemyPrepArea : MonoBehaviour, ICardDropArea
     public bool HasCard => _currentCard != null;
     public CardDropArea FrontCardDropArea => _frontCardDropArea;
 
-    private Card _currentCard;
+    private CardView _currentCard;
 
     private void Start()
     {
         _parentLaneView = GetComponentInParent<LaneView>();
     }
 
-    public void OnCardDrop(Card card)
+    public void OnCardDrop(CardView card)
     {
         //Animation
         _currentCard = card;
@@ -27,10 +27,10 @@ public class EnemyPrepArea : MonoBehaviour, ICardDropArea
     {
 
     }
-    public Card TriggerPush()
+    public CardView TriggerPush()
     {
         if (_currentCard == null) return null;
-        Card cardToPlay = _currentCard;
+        CardView cardToPlay = _currentCard;
         _currentCard = null;
         return cardToPlay;
     }

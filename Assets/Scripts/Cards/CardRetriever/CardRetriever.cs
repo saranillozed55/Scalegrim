@@ -5,31 +5,31 @@ using UnityEngine;
 
 public class CardRetriever
 {
-    private List<Card> currentDeck;
+    private List<CardModel> currentDeck;
 
-    public CardRetriever(List<Card> currentDeck)
+    public CardRetriever(List<CardModel> currentDeck)
     {
         this.currentDeck = currentDeck;
     }
 
     //Retrieves card to overpower player card in lane if possible, otherwise retrieves next card in deck
-    public Card RetrieveCard(AIPersonality profile, LaneSnapShot lane)
+    public CardModel RetrieveCard(AIPersonality profile, LaneSnapShot lane)
     {
-        Card bestCard = null;
+        CardModel bestCard = null;
         float highestCardScore = Mathf.NegativeInfinity;
 
-        foreach(Card card in currentDeck)
+        foreach(CardModel card in currentDeck)
         {
             if(card == null)
             {
                 Debug.LogWarning($"Card being accessed is null");
                 continue;
             }
-            float attackWeight = card.BaseDamage * profile.AggressionMultipler;
-            float healthWeight = card.BaseHealth * profile.SurvivalMultiplier;
+            float attackWeight = card.AttackDamage * profile.AggressionMultipler;
+            float healthWeight = card.Health * profile.SurvivalMultiplier;
             float finalWeight = attackWeight + healthWeight;
 
-            if (lane.PlayerCard.HasValue && card.BaseHealth > lane.PlayerCard.Value.Attack)
+            if (lane.PlayerCard.HasValue && card.Health > lane.PlayerCard.Value.Attack)
             {
                 if(finalWeight > highestCardScore)
                 {
@@ -40,16 +40,16 @@ public class CardRetriever
         }
         if(bestCard != null)
         {
-            Debug.Log($"<color=cyan> This Card '{bestCard.name}' has enough health to survive the player's attack. Returning this card.</color>");
+            Debug.Log($"<color=cyan> This Card '{bestCard.Name}' has enough health to survive the player's attack. Returning this card.</color>");
             return bestCard;
         }
         return RetrieveCard();
     }
 
     //Take the first card in the enemy deck. Use last.
-    public Card RetrieveCard()
+    public CardModel RetrieveCard()
     {
-        foreach(Card card in currentDeck)
+        foreach(CardModel card in currentDeck)
         {
             if (card != null) return card;
         }

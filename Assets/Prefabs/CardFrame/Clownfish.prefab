@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 85, y: -40}
-  m_SizeDelta: {x: 223.8, y: 50}
+  m_SizeDelta: {x: 223.79999, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4836473291050074342
 CanvasRenderer:
@@ -399,8 +399,6 @@ MonoBehaviour:
   baseDamage: 2
   baseHealth: 3
   baseCost: 0
-  _cardClicked: {fileID: 11400000, guid: 69dcc6b57bbcd1e4c8f40e3faf4e249d, type: 2}
-  _cardSelected: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
   _basePosition: {x: 0, y: 0, z: 0}
   _placedPosition: {x: 0, y: 0, z: 0}
   _baseRotation: {x: 0, y: 0, z: 0, w: 0}
