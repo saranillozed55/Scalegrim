@@ -8,13 +8,13 @@ public class CardModel
     public bool CardSelected { get; private set; }
     public bool CardHoverable { get; private set; }
 
+    public void SetHoverable(bool value) => CardHoverable = value;
     public Lane Lane => BoardLaneManager.Instance.LogicLanes.FirstOrDefault(lane =>
             lane.PlayerActiveCard == this ||
             lane.EnemyActiveCard == this ||
             lane.EnemyQueuedCard == this
         );
 
-    public void SetHoverable(bool value) => CardHoverable = value;
 
     public Owner? BoardOwner
     {
@@ -38,20 +38,31 @@ public class CardModel
         Cost = cardData.Cost;
         Health = cardData.Health;
         AttackDamage = cardData.AttackDamage;
+        ViewPrefab = cardData.ViewPrefab;
     }
+
+    public string Name { get => cardData.Name; }
+    public CardView ViewPrefab
+    {
+        get
+        {
+            return cardData.ViewPrefab;
+        }
+        private set
+        {
+
+        }
+    }
+
     public int Cost { get; set; }
     public int Health { get; set; }
     public int AttackDamage { get; set; }
-    public string Name { get => cardData.Name; }
-    public bool Dead
-    {
-        get;
-        set;
-    }
+    public bool Dead { get; set; }
 
-    public void PlayCard() 
+
+    public void PlayCard()
     {
-        if(!CardPlaced)
+        if (!CardPlaced)
             CardPlaced = true;
     }
 
@@ -59,6 +70,4 @@ public class CardModel
     {
         CardsDamager.ApplyDamage(attackingCard, defendingCard);
     }
-    
-
 }

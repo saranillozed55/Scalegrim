@@ -29,7 +29,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     private Vector3 _placedPosition;
 
     public void SetBasePosition(Vector3 value) => _basePosition = value;
-    public void SetBaseRotation(Quaternion value) => _baseRotation = value;
+    public void SetBaseRotation(Quaternion value) => _baseRotation = value; // move this to a function that does the _basePosition and _baseRotation, as well as SetBasePosition
     public void SetPlacedPosition(Vector3 value) => _placedPosition = value;
 
     public Quaternion BaseRotation { get; private set; }

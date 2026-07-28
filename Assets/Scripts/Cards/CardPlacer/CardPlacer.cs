@@ -11,8 +11,9 @@ public class CardPlacer
             Debug.LogWarning($"HandlePlaceCard: Recieved null card, can't place card in Queue");
             return;
         }
+
         CardView view = CardView.GetView(card);
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(view, laneIndex, out bool full);
+        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(card, view, laneIndex, out bool full);
 
         if (!full)
         {

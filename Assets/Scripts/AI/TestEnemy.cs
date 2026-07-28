@@ -14,6 +14,8 @@ public enum CardPreference
 
 public class TestEnemy : MonoBehaviour
 {
+    [SerializeField] private List<CardDataSO> _enemyCards;
+
     [SerializeField] private int _maxCards = 5; // enemy shouldnt have _maxCards unless we want it to
 
     [SerializeField] private List<EnemyPrepArea> _prepArea;
@@ -45,8 +47,21 @@ public class TestEnemy : MonoBehaviour
 
     private void Start()
     {
+        InitBaseDeck();
         cardRetriever = new CardRetriever(_enemyDeck);
+
+        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
+        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 2);
     }
+
+    private void InitBaseDeck()
+    {
+        for(int i = 0; i < _enemyCards.Count; i++)
+        {
+            _enemyDeck.Add(new CardModel(_enemyCards[i])); 
+        }
+    }
+
     private BoardState CheckCurrentBoardState()
     {
         BoardState currState = BoardLaneManager.Instance.CaptureBoardState();

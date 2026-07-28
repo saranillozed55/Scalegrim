@@ -96,6 +96,7 @@ public class HandManager : GenericSingleton<HandManager>
             // last card (highest index) is closest to camera
             position -= _fpCamera.transform.forward * (i * 0.01f);
 
+            //MOVE THIS TO CARDVIEW I BELIEVE
             CardView cardView = _handCards[i];
             cardView.SetBasePosition(position);
             cardView.SetBaseRotation(_handPosition.rotation);

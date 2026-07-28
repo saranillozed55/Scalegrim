@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 public static class CardsDamager
@@ -23,6 +24,12 @@ public static class CardsDamager
         if(defendingCard.CardPlaced && defendingCard.Health <= 0 && !defendingCard.Dead)
         {
             defendingCard.Dead = true;
+
+            CardView view = CardView.GetView(defendingCard);
+            if(view != null)
+            {
+                GameObject.Destroy(view.gameObject);
+            }
         }
     }
 }

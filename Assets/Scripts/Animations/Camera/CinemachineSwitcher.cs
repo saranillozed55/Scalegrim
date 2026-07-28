@@ -1,12 +1,10 @@
-using DG.Tweening;
-using System;
 using System.Collections.Generic;
 using Unity.Cinemachine;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum CameraState { 
+public enum CameraState
+{
     FPCamera,
     BoardCamera,
     PlayerHandCamera,
@@ -26,7 +24,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
     [Header("References")]
     [Space]
     [SerializeField] private CinemachineCamera[] _cameras;
-        
+
     [SerializeField] private CinemachineCamera _firstPersonCamera;
     [SerializeField] private CinemachineCamera _boardCamera;
     [SerializeField] private CinemachineCamera _startingCamera;
@@ -90,11 +88,11 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     private void HandleForwardButton()
     {
-        if(_currentCameraState == CameraState.PlayerHandCamera)
+        if (_currentCameraState == CameraState.PlayerHandCamera)
         {
             SwitchState(CameraState.FPCamera);
         }
-        else if(_currentCameraState == CameraState.FPCamera)
+        else if (_currentCameraState == CameraState.FPCamera)
         {
             SwitchState(CameraState.BoardCamera);
         }
@@ -102,11 +100,11 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     private void HandleBackButton()
     {
-        if(_currentCameraState == CameraState.FPCamera)
+        if (_currentCameraState == CameraState.FPCamera)
         {
             SwitchState(CameraState.PlayerHandCamera);
         }
-        else if(_currentCameraState == CameraState.BoardCamera)
+        else if (_currentCameraState == CameraState.BoardCamera)
         {
             SwitchState(CameraState.FPCamera);
         }

@@ -18,6 +18,9 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     [Header("Listener to EventChannels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
 
+    [Header("Test card prefab")]
+    [SerializeField] private CardView _cardViewPrefab;
+
     public List<Lane> LogicLanes => logicLanes;
 
     protected override void Awake()
@@ -61,9 +64,10 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         logicLanes[laneIndex] = updatedLane;
     }
 
-    public void PlaceEnemyCardsInQueue(CardView cardViewPrefab, int laneIndex, out bool full)
+    public void PlaceEnemyCardsInQueue(CardModel model, CardView cardViewPrefab, int laneIndex, out bool full)
     {
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
+
         if (targetPrepArea != null && !targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
         {
             full = true;
@@ -71,17 +75,18 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         }
 
         full = false;
-        GameObject instance = Instantiate(cardViewPrefab.gameObject, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
+        
+        //HERE-------------------------------------------------------------------------------------------------------------------------------------- Card view prefab
+        CardView instance = Instantiate(_cardViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
+        instance.InitCard(model);
+        instance.CardModel.PlayCard();
 
-        CardView cardInstance = instance.GetComponent<CardView>();
-        cardInstance.CardModel.PlayCard();
-
-        logicLanes[laneIndex].EnemyQueuedCard = cardInstance.CardModel;
+        logicLanes[laneIndex].EnemyQueuedCard = instance.CardModel;
         Vector3 targetPosition = targetPrepArea.transform.position;
 
         instance.transform.DOKill();
         instance.transform.DOMove(targetPosition, 0.3f);
-        instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f).OnComplete(() => targetPrepArea.OnCardDrop(cardInstance));
+        instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f).OnComplete(() => targetPrepArea.OnCardDrop(instance));
     }
 
     public async void AdvanceEnemyCardsFromQueue()

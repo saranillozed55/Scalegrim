@@ -2182,6 +2182,7 @@ MonoBehaviour:
   - {fileID: 1701883288}
   _onCombatStart: {fileID: 11400000, guid: 915cc0dac3f10634298ecb97b458aa6e, type: 2}
   _onPlayerEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
+  _cardViewPrefab: {fileID: -6514747111338680940, guid: de0680eb0731e8e478c7846857ce9e99, type: 3}
 --- !u!1 &872892234
 GameObject:
   m_ObjectHideFlags: 0
@@ -3958,6 +3959,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebf748e4d57c0dc45b4647166f14265c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemy
+  _enemyCards:
+  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
+  - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
   _maxCards: 5
   _prepArea:
   - {fileID: 1835653811}
