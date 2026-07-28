@@ -5,7 +5,6 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
-//Want card view to be initialized when we load it into the game such as the player deck stack
 public class CardView : MonoBehaviour, IClickable, IHoverable
 {
 
@@ -31,9 +30,9 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
 
     public void SetBasePosition(Vector3 value) => _basePosition = value;
     public void SetBaseRotation(Quaternion value) => _baseRotation = value;
-    public Quaternion BaseRotation { get; private set; }
-
     public void SetPlacedPosition(Vector3 value) => _placedPosition = value;
+
+    public Quaternion BaseRotation { get; private set; }
 
     public void InitCard(CardModel card)
     {
@@ -42,6 +41,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         _name.text = card.Name;
         _cost.text = card.Cost.ToString();
         _health.text = card.Health.ToString();
+        _attack.text = card.AttackDamage.ToString();
     }
 
     public virtual void OnHoverEnter()
@@ -62,7 +62,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     {
         if (card.CardSelected || card.CardPlaced || !card.CardHoverable) return;
 
-        //SelectionManager.Instance.OnCardClicked(card);
+        SelectionManager.Instance.OnCardClicked(this);
     }
 
     public virtual async Awaitable CardAttackAsync(CardModel attackingCard, CardModel defendingCard)
@@ -92,13 +92,10 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     }
     public void Select()
     {
-        Debug.Log("Card was selected");
-        //HandManager.Instance.CardTempLeave(this);
+        //Debug.Log("Card was selected");
     }
     public void Deselect()
     {
-        Debug.Log("Card was deselected");
-        //HandManager.Instance.CardBackToHand();
+        //Debug.Log("Card was deselected");
     }
-
 }

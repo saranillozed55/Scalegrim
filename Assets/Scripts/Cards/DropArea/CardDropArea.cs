@@ -30,7 +30,7 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
         if(playedCard != null)
         {
             BoardLaneManager.Instance.PlaceCardInLane(playedCard.CardModel, laneIndex, SlotOwner);
-            playedCard.SetBasePosition(transform.position);
+            playedCard.SetPlacedPosition(transform.position);
         }
         else
         {

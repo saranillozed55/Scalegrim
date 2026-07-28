@@ -6,9 +6,9 @@ public class PlayerDeck : MonoBehaviour
 {
     [SerializeField] private int _maxStack = 5;
     private List<CardModel> _deck = new();
-    public List<CardModel> _startingDeck = new(); 
-
     public List<CardModel> Deck => _deck;
+
+    public List<CardDataSO> _startingDeck = new(); 
 
     private void Start()
     {
@@ -22,9 +22,9 @@ public class PlayerDeck : MonoBehaviour
 
     private void InitalizeBaseDeck()
     {
-        for (int i = 0; i < _maxStack; i++)
+        for (int i = 0; i < _startingDeck.Count; i++)
         {
-            _deck.Add(_startingDeck[i]);
+            _deck.Add(new CardModel(_startingDeck[i]));
         }
     }
 

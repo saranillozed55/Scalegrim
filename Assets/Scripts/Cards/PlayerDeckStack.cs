@@ -39,6 +39,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
         for (int i = 0; i < deckCards.Count; i++)
         {
             CardView instance = Instantiate(_cardViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
+            instance.InitCard(deckCards[i]);
 
             float delay = i * 0.08f;
             Vector3 position = _playerDeckStackPosition.position + (Vector3.up * _gapSize * i);
@@ -77,7 +78,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
         {
             foreach (CardView card in _deckCards)
             {
-                Destroy(card);
+                Destroy(card.gameObject);
             }
             _deckCards.Clear();
             _stackLoaded = false;

@@ -75,9 +75,11 @@ public class HandManager : GenericSingleton<HandManager>
 
     public bool DrawCard(CardView newCard)
     {
+        if (newCard == null) return false;
         if (_handCards.Count >= maxHandSize) return false;
         _handCards.Add(newCard);
         newCard.CardModel.SetHoverable(false);
+        
         UpdateCardPosition();
         return true;
     }

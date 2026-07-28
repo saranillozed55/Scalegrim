@@ -976,7 +976,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 223
+    m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 2bd95f273805b9843aefda63755c1ea7, type: 2}
   m_TargetDisplay: 0
@@ -2005,15 +2005,12 @@ MonoBehaviour:
   _cardLayer:
     serializedVersion: 2
     m_Bits: 8
-  cardPrefab: {fileID: 6956803528998207812, guid: 37980ac53a556234b9dfea2fc28ea580, type: 3}
+  cardViewPrefab: {fileID: 0}
   cardOverlap: 0.15
   spawnPoint: {fileID: 449858711}
   _viewToUsePoint: {fileID: 0}
   _handPosition: {fileID: 66736066}
   _fpCamera: {fileID: 849692302}
-  _cardClicked: {fileID: 11400000, guid: 69dcc6b57bbcd1e4c8f40e3faf4e249d, type: 2}
-  _cardPlayed: {fileID: 11400000, guid: 519321457fe8fd04ba9d36c08544dbcf, type: 2}
-  _cardUnselected: {fileID: 11400000, guid: e2517d71858c06743b2a7c9d58a93ea2, type: 2}
 --- !u!4 &837550915
 Transform:
   m_ObjectHideFlags: 0
@@ -2232,14 +2229,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1a1c9e979363564bb12c6667160e1c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDeck
-  _tempCardPrefab: {fileID: 1975676740774176047, guid: 37980ac53a556234b9dfea2fc28ea580, type: 3}
   _maxStack: 5
   _startingDeck:
-  - {fileID: 4463068104647219744, guid: 1c6f0ba530a1cf641b91cc40e36794f9, type: 3}
-  - {fileID: 4463068104647219744, guid: 1c6f0ba530a1cf641b91cc40e36794f9, type: 3}
-  - {fileID: 8734954656718284070, guid: 5041d75a3afa7e94a9d900187ca291b7, type: 3}
-  - {fileID: 8734954656718284070, guid: 5041d75a3afa7e94a9d900187ca291b7, type: 3}
-  - {fileID: 3178167174503388668, guid: 5a5f720c92343664aa903aa13a1ed631, type: 3}
+  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
+  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
 --- !u!1 &927112455
 GameObject:
   m_ObjectHideFlags: 0
@@ -3966,18 +3959,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemy
   _maxCards: 5
-  _cardPrefab: {fileID: 1975676740774176047, guid: 37980ac53a556234b9dfea2fc28ea580, type: 3}
   _prepArea:
   - {fileID: 1835653811}
   - {fileID: 1015739483}
   - {fileID: 1196077341}
-  _enemyDeck:
-  - {fileID: 1975676740774176047, guid: 37980ac53a556234b9dfea2fc28ea580, type: 3}
-  - {fileID: 8734954656718284070, guid: 5041d75a3afa7e94a9d900187ca291b7, type: 3}
-  - {fileID: 8734954656718284070, guid: 5041d75a3afa7e94a9d900187ca291b7, type: 3}
-  - {fileID: 4463068104647219744, guid: 1c6f0ba530a1cf641b91cc40e36794f9, type: 3}
-  - {fileID: 4463068104647219744, guid: 92a47c63ac6e3be44bde66a84a26447c, type: 3}
-  - {fileID: 4463068104647219744, guid: 92a47c63ac6e3be44bde66a84a26447c, type: 3}
   _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   DAMAGE_THRESHOLD: 3
   _aiProfile: {fileID: 11400000, guid: 9c38eb54a91449641bf6cd4127570608, type: 2}
@@ -4701,6 +4686,7 @@ MonoBehaviour:
   _gapSize: 0.01
   _spawnLocation: {fileID: 69232226}
   _playerDeck: {fileID: 872892236}
+  _cardViewPrefab: {fileID: -6514747111338680940, guid: de0680eb0731e8e478c7846857ce9e99, type: 3}
 --- !u!65 &1898344740
 BoxCollider:
   m_ObjectHideFlags: 0
