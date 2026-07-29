@@ -1,8 +1,8 @@
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CardView : MonoBehaviour, IClickable, IHoverable
@@ -98,4 +98,26 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     {
         //Debug.Log("Card was deselected");
     }
+    
+    public async Task MoveCardToPosition(Vector3 targetPosition)
+    {
+        transform.DOKill();
+
+        Sequence sequence = DOTween.Sequence();
+        sequence.Join(transform.DOMove(targetPosition, 0.3f)); //magic number
+
+        await sequence.AsyncWaitForCompletion();
+    }
+
+    public async Task MoveCardToPosition(Vector3 targetPosition, Quaternion targetRotation)
+    {
+        transform.DOKill();
+
+        Sequence sequence = DOTween.Sequence();
+        sequence.Join(transform.DOMove(targetPosition, 0.3f));
+        sequence.Join(transform.DORotateQuaternion(targetRotation, 0.3f));
+
+        await sequence.AsyncWaitForCompletion();
+    }
+
 }

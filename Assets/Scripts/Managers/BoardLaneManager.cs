@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.Analytics;
 using System;
+using System.Threading.Tasks;
 
 public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
@@ -64,29 +65,25 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         logicLanes[laneIndex] = updatedLane;
     }
 
-    public void PlaceEnemyCardsInQueue(CardModel model, CardView cardViewPrefab, int laneIndex, out bool full)
+    public async Task<bool> PlaceEnemyCardsInQueue(CardModel model, int laneIndex)
     {
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
 
         if (targetPrepArea != null && !targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
         {
-            full = true;
-            return;
+            return false;
         }
 
-        full = false;
-        
-        //HERE-------------------------------------------------------------------------------------------------------------------------------------- Card view prefab
-        CardView instance = Instantiate(_cardViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
+        CardView instance = Instantiate(model.ViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
         instance.InitCard(model);
         instance.CardModel.PlayCard();
 
         logicLanes[laneIndex].EnemyQueuedCard = instance.CardModel;
         Vector3 targetPosition = targetPrepArea.transform.position;
+        await instance.MoveCardToPosition(targetPosition, CardRotations._cardFaceFlatUp);
+        targetPrepArea.OnCardDrop(instance);
 
-        instance.transform.DOKill();
-        instance.transform.DOMove(targetPosition, 0.3f);
-        instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f).OnComplete(() => targetPrepArea.OnCardDrop(instance));
+        return true;
     }
 
     public async void AdvanceEnemyCardsFromQueue()
@@ -142,12 +139,14 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             Transform targetLocation = view.EnemyActiveArea.transform;
             Quaternion targetRotation = CardRotations._cardFaceFlatUp; // WANT TO CHANGE THIS LATER TO MIMIC INSCRYPTION MAYBE
 
-            Sequence animSequence = DOTween.Sequence();
+            //MOVE THIS TO USE CARDVIEW METHODS
+            await card.MoveCardToPosition(targetLocation.position);
 
-            animSequence.Join(card.transform.DOMove(targetLocation.position, 0.3f).SetEase(Ease.OutQuad));
-            animSequence.Join(card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f));
+            //Sequence animSequence = DOTween.Sequence();
+            //animSequence.Join(card.transform.DOMove(targetLocation.position, 0.3f).SetEase(Ease.OutQuad));
+            //animSequence.Join(card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f));
 
-            await animSequence.AsyncWaitForCompletion();
+            //await animSequence.AsyncWaitForCompletion();
 
             view.EnemyActiveArea.OnCardDrop(card);
         }
@@ -175,7 +174,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             };
             state.Lanes.Add(snapShot);
         }
-
         return state;
     }
 

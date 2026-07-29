@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b62c1bd79677da84eb73ba96ae538309, type: 3}
   m_Name: ClownFishSO
   m_EditorClassIdentifier: Assembly-CSharp::CardDataSO
+  <ViewPrefab>k__BackingField: {fileID: -6514747111338680940, guid: de0680eb0731e8e478c7846857ce9e99, type: 3}
   <Id>k__BackingField: clown_fish
   <Name>k__BackingField: ClownFish
-  <Cost>k__BackingField: 0
-  <Health>k__BackingField: 0
-  <AttackDamage>k__BackingField: 0
+  <Cost>k__BackingField: 1
+  <Health>k__BackingField: 1
+  <AttackDamage>k__BackingField: 1

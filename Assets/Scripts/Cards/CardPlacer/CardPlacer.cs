@@ -1,10 +1,11 @@
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class CardPlacer
 {
-    public void HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
+    public async Task HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
     {
         if (card == null)
         {
@@ -12,16 +13,15 @@ public class CardPlacer
             return;
         }
 
-        CardView view = CardView.GetView(card);
-        BoardLaneManager.Instance.PlaceEnemyCardsInQueue(card, view, laneIndex, out bool full);
+        bool placed = await BoardLaneManager.Instance.PlaceEnemyCardsInQueue(card, laneIndex);
 
-        if (!full)
+        if (placed)
         {
             enemyDeck.Remove(card);
         }
         else
         {
-            Debug.Log($"<color=cyan> This Card can't be placed in queue because there is already a card in the active area or the prep area. </color>");
+            Debug.Log("This card can't be placed in queue because there is already a card in the active area");
         }
     }
 }

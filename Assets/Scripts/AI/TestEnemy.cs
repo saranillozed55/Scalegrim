@@ -50,8 +50,8 @@ public class TestEnemy : MonoBehaviour
         InitBaseDeck();
         cardRetriever = new CardRetriever(_enemyDeck);
 
-        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
-        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 2);
+        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
+        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
     }
 
     private void InitBaseDeck()
@@ -93,7 +93,7 @@ public class TestEnemy : MonoBehaviour
                 if (currentStrongestCard != null)
                 {
                     //HandlePlaceCard(currentStrongestCard, lane.LaneIndex);
-                    cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
+                    _ = cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
                 }
                 continue;
             }
@@ -114,7 +114,7 @@ public class TestEnemy : MonoBehaviour
                         Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
 
                         //HandlePlaceCard(card, lane.LaneIndex);
-                        cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
+                        _ = cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
                         break;
                     }
                     else if (!lane.PlayerCard.HasValue)

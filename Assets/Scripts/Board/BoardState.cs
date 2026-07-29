@@ -9,12 +9,10 @@ public struct BoardState
 
 public struct LaneSnapShot
 {
-
     public int LaneIndex;
     public CardSnapShot? EnemyCard;
     public CardSnapShot? PlayerCard;
     public CardSnapShot? EnemyQueuedCard;
-
 }
 
 public struct CardSnapShot

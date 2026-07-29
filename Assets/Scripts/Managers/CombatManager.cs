@@ -5,16 +5,10 @@ public class CombatManager : GenericSingleton<CombatManager>
     [Header("Broadcast to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
-
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
 
-
     public bool IsInCombat { get; private set; }
-
-    //[Header("Brodacast to Event Channels")]
-
-    //private CardAttackInvoker _invoker = new CardAttackInvoker();
 
     private void Start()
     {
@@ -52,7 +46,7 @@ public class CombatManager : GenericSingleton<CombatManager>
         {
             if (lane.EnemyActiveCard != null && !lane.EnemyActiveCard.Dead)
             {
-                CardView view = CardView.GetView(lane.EnemyQueuedCard);
+                CardView view = CardView.GetView(lane.EnemyActiveCard);
                 if (view != null) await view.CardAttackAsync(lane.EnemyActiveCard, lane.PlayerActiveCard);
 
             }

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class TurnManager : GenericSingleton<TurnManager>
 {
-
     public TurnState CurrentTurnState { get; private set; }
     [Header("Broadcast to Event Channels")]
     [SerializeField] private CameraStateEventChannel _onEndTurnCam;

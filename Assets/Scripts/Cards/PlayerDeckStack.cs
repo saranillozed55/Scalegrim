@@ -12,7 +12,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
     [SerializeField] private float _gapSize = 0.02f;
     [SerializeField] private Transform _spawnLocation;
     [SerializeField] private PlayerDeck _playerDeck;
-    [SerializeField] private CardView _cardViewPrefab;
+    //[SerializeField] private CardView _cardViewPrefab;
 
     private Stack<CardView> _deckCards = new();
 
@@ -38,7 +38,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
     {
         for (int i = 0; i < deckCards.Count; i++)
         {
-            CardView instance = Instantiate(_cardViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
+            CardView instance = Instantiate(deckCards[i].ViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
             instance.InitCard(deckCards[i]);
 
             float delay = i * 0.08f;
