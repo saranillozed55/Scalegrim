@@ -1,11 +1,5 @@
-using DG.Tweening;
-using NUnit.Framework;
 using System.Collections.Generic;
-using Unity.Multiplayer.PlayMode;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.InputSystem;
-
 public enum CardPreference
 {
     OVERPOWER,
@@ -22,6 +16,9 @@ public class TestEnemy : MonoBehaviour
 
     [SerializeField] private List<CardModel> _enemyDeck = new();
 
+    [Header("Blueprint list")]
+    [SerializeField] private List<Blueprint> _bluePrints;
+
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
@@ -33,28 +30,34 @@ public class TestEnemy : MonoBehaviour
 
     BoardEvaluater eval = new BoardEvaluater();
     CardPlacer cardPlacer = new CardPlacer();
+    EnemyTurnQueue enemyTurnQueue = new EnemyTurnQueue();
     CardRetriever cardRetriever;
+
+    private int turnsPassed = 0;
 
     private void OnEnable()
     {
         _onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
+        _onEnemyEndTurn.onEventRaised += OpponentTurn;
     }
 
     private void OnDisable()
     {
         _onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
+        _onEnemyEndTurn.onEventRaised -= OpponentTurn;
     }
 
     private void Start()
     {
         InitBaseDeck();
+        OnCombatStart();
         cardRetriever = new CardRetriever(_enemyDeck);
 
-        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
-        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
+        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
+        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
     }
 
-    private void InitBaseDeck()
+    private void InitBaseDeck() // won't be using this anymore because will have blueprints later on
     {
         for(int i = 0; i < _enemyCards.Count; i++)
         {
@@ -71,6 +74,25 @@ public class TestEnemy : MonoBehaviour
             Debug.Log($" LaneIndex {i + 1}, EnemyQueuedCard: {currState.Lanes[i].EnemyQueuedCard}, EnemyCard: {currState.Lanes[i].EnemyCard},  PlayerCard: {currState.Lanes[i].PlayerCard}");
         }
         return currState;
+    }
+
+    private void OnCombatStart()
+    {
+        if (_bluePrints.Count <= 0)
+        {
+            Debug.Log("No blueprints in enemy list");
+            return;
+        }
+
+        int random = Random.Range(0, _bluePrints.Count);
+        Blueprint blueprint = _bluePrints[random];
+        Debug.Log($"Blueprint chosen: {blueprint.name}");
+        enemyTurnQueue.GenerateEnemyQueue(blueprint);
+    }
+
+    private void OpponentTurn()
+    {
+        
     }
 
     private void QueueNextCardInLane()
@@ -92,8 +114,7 @@ public class TestEnemy : MonoBehaviour
 
                 if (currentStrongestCard != null)
                 {
-                    //HandlePlaceCard(currentStrongestCard, lane.LaneIndex);
-                    _ = cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
+                    cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
                 }
                 continue;
             }
@@ -113,8 +134,7 @@ public class TestEnemy : MonoBehaviour
                     {
                         Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
 
-                        //HandlePlaceCard(card, lane.LaneIndex);
-                        _ = cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
+                        cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
                         break;
                     }
                     else if (!lane.PlayerCard.HasValue)

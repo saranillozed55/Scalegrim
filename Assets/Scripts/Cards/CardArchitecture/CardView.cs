@@ -109,12 +109,21 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         await sequence.AsyncWaitForCompletion();
     }
 
-    public async Task MoveCardToPosition(Vector3 targetPosition, Quaternion targetRotation)
+    public async Task MoveCardToPosition(Vector3 targetPosition, Quaternion targetRotation) // ADD DURATION TO THIS FLOAT
     {
         transform.DOKill();
 
         Sequence sequence = DOTween.Sequence();
         sequence.Join(transform.DOMove(targetPosition, 0.3f));
+        sequence.Join(transform.DORotateQuaternion(targetRotation, 0.3f));
+
+        await sequence.AsyncWaitForCompletion();
+    }
+
+    public async Task RotateCard(Quaternion targetRotation)
+    {
+        transform.DOKill();
+        Sequence sequence = DOTween.Sequence();
         sequence.Join(transform.DORotateQuaternion(targetRotation, 0.3f));
 
         await sequence.AsyncWaitForCompletion();

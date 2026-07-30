@@ -1,5 +1,7 @@
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Cinemachine;
 using Unity.VectorGraphics;
 using UnityEngine;
@@ -84,7 +86,7 @@ public class HandManager : GenericSingleton<HandManager>
         return true;
     }
 
-    private void UpdateCardPosition()
+    private async void UpdateCardPosition()
     {
         Vector3 handCenter = _handPosition.position;
 
@@ -101,10 +103,15 @@ public class HandManager : GenericSingleton<HandManager>
             cardView.SetBasePosition(position);
             cardView.SetBaseRotation(_handPosition.rotation);
 
-            cardView.transform.DOKill();
-            cardView.transform.DOMove(position, 0.25f)
-                .OnComplete(() => cardView.CardModel.SetHoverable(true));
-            cardView.transform.DORotateQuaternion(_handPosition.rotation, 0.25f);
+            try
+            {
+                await cardView.MoveCardToPosition(position, _handPosition.rotation);
+                cardView.CardModel.SetHoverable(true);
+            }
+            catch(Exception e)
+            {
+                Debug.LogError("Error[Hand Manager]: " + e);
+            }
         }
     }
 
@@ -155,23 +162,29 @@ public class HandManager : GenericSingleton<HandManager>
         _handCards.Clear();
     }
 
-    public void CardTempLeave(CardView card)
+    public async void CardTempLeave(CardView card)
     {
         _allowCardHover = false;
         _handCards.Remove(card);
 
         SwitchHandState(HandState.Selected);
-        card.transform.DOKill();
-        card.transform.DOMove(_viewToUsePoint.position, 0.3f);
-        card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f);
+
+        try
+        {
+           await card.MoveCardToPosition(_viewToUsePoint.position, CardRotations._cardFaceFlatUp);
+        }
+
+        catch(Exception e)
+        {
+            Debug.LogError("Error[Hand Manager]: " + e.Message);
+        }
     }
 
-    public void CardBackToHand(CardView card)
+    public async Task CardBackToHand(CardView card)
     {
         _handCards.Add(card);
 
-        card.transform.DOKill();
-        card.transform.DORotateQuaternion(card.BaseRotation, 0.25f);
+        await card.RotateCard(card.BaseRotation);
 
         _allowCardHover = true;
 
@@ -179,7 +192,7 @@ public class HandManager : GenericSingleton<HandManager>
         UpdateCardPosition();
     }
 
-    public void PlayCurrentCard(CardDropArea targetArea)
+    public async Task PlayCurrentCard(CardDropArea targetArea)
     {
         if (targetArea.SlotOwner != Owner.Player) return;
 
@@ -187,13 +200,18 @@ public class HandManager : GenericSingleton<HandManager>
         SelectionManager.Instance.CardPlayedDeselect();
         if (playedCard == null) return;
 
-        playedCard.transform.DOKill();
-        playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
-        {
-            playedCard.CardModel.PlayCard();
-            targetArea.OnCardDrop(playedCard);
-            _allowCardHover = true;
-        });
+        await playedCard.MoveCardToPosition(targetArea.transform.position);
+        playedCard.CardModel.PlayCard();
+        targetArea.OnCardDrop(playedCard);
+        _allowCardHover = true;
+
+        //playedCard.transform.DOKill();
+        //playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+        //{
+        //    playedCard.CardModel.PlayCard();
+        //    targetArea.OnCardDrop(playedCard);
+        //    _allowCardHover = true;
+        //});
 
         SwitchHandState(HandState.InHand);
         UpdateCardPosition();

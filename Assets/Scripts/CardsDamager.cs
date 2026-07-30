@@ -28,8 +28,9 @@ public static class CardsDamager
             CardView view = CardView.GetView(defendingCard);
             if(view != null)
             {
-                GameObject.Destroy(view.gameObject);
+                GameObject.Destroy(view.gameObject);   
             }
+            BoardLaneManager.Instance.RemoveCardFromLane(defendingCard);
         }
     }
 }

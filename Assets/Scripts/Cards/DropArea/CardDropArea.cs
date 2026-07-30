@@ -48,7 +48,7 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
     {
         if (SelectionManager.Instance.SelectedHandCard != null && !IsFull() && SlotOwner == Owner.Player)
         {
-            HandManager.Instance.PlayCurrentCard(this);
+           _ = HandManager.Instance.PlayCurrentCard(this);
         }
     }
     private void PlaySlamAnimation()

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SelectionManager : GenericSingleton<SelectionManager>
@@ -41,11 +42,10 @@ public class SelectionManager : GenericSingleton<SelectionManager>
         //change camera
     }
 
-    public void DeselectCard()
+    public async void DeselectCard()
     {
         if (SelectedHandCard == null) return;
 
-        HandManager.Instance.CardBackToHand(SelectedHandCard);
 
         SelectedHandCard.Deselect();
 
@@ -53,6 +53,14 @@ public class SelectionManager : GenericSingleton<SelectionManager>
 
         CinemachineSwitcher.Instance.FocusFPCameraView();
         //change camera
+        try
+        {
+            await HandManager.Instance.CardBackToHand(SelectedHandCard);
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("Error[Selection Manager]: " + e.Message);
+        }
     }
     public void CardPlayedDeselect()
     {

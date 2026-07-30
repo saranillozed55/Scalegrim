@@ -25,15 +25,16 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     private void Update()
     {
-        if(Keyboard.current.lKey.wasPressedThisFrame && !_stackLoaded)
+        if (Keyboard.current.lKey.wasPressedThisFrame && !_stackLoaded)
         {
             LoadDeck(_playerDeck.Deck);
         }
-        if(Keyboard.current.kKey.wasPressedThisFrame)
+        if (Keyboard.current.kKey.wasPressedThisFrame)
         {
             ClearDeckStack();
         }
     }
+
     public void LoadDeck(List<CardModel> deckCards)
     {
         for (int i = 0; i < deckCards.Count; i++)
@@ -47,7 +48,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
             instance.transform.DOKill();
             instance.transform.DOMove(position, 0.3f).SetDelay(delay);
 
-            instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatDown, 0.3f).SetDelay(delay); 
+            instance.transform.DORotateQuaternion(CardRotations._cardFaceFlatDown, 0.3f).SetDelay(delay);
             _deckCards.Push(instance);
         }
         _stackLoaded = true;
@@ -63,7 +64,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
         CardView poppedCard = _deckCards.Pop();
         bool drawn = HandManager.Instance.DrawCard(poppedCard);
 
-        if(!drawn)
+        if (!drawn)
         {
             _deckCards.Push(poppedCard);
         }

@@ -18,4 +18,4 @@ MonoBehaviour:
   SurvivalMultiplier: 1
   KillPlayerBonus: 25
   BlockPlayerBonus: 5
-  EmptyLanePenalty: -2
+  EmptyLanePenalty: 0

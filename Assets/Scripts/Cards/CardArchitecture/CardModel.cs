@@ -1,5 +1,8 @@
+using System;
 using System.Linq;
 using UnityEngine;
+
+[Serializable]
 public class CardModel
 {
     private readonly CardDataSO cardData;

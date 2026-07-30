@@ -11,7 +11,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
-    private List<Lane> logicLanes = new List<Lane>();
 
     [Header("Broadcast to EventChannels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
@@ -22,6 +21,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     [Header("Test card prefab")]
     [SerializeField] private CardView _cardViewPrefab;
 
+    private List<Lane> logicLanes = new List<Lane>();
     public List<Lane> LogicLanes => logicLanes;
 
     protected override void Awake()
@@ -139,14 +139,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             Transform targetLocation = view.EnemyActiveArea.transform;
             Quaternion targetRotation = CardRotations._cardFaceFlatUp; // WANT TO CHANGE THIS LATER TO MIMIC INSCRYPTION MAYBE
 
-            //MOVE THIS TO USE CARDVIEW METHODS
             await card.MoveCardToPosition(targetLocation.position);
-
-            //Sequence animSequence = DOTween.Sequence();
-            //animSequence.Join(card.transform.DOMove(targetLocation.position, 0.3f).SetEase(Ease.OutQuad));
-            //animSequence.Join(card.transform.DORotateQuaternion(CardRotations._cardFaceFlatUp, 0.3f));
-
-            //await animSequence.AsyncWaitForCompletion();
 
             view.EnemyActiveArea.OnCardDrop(card);
         }
@@ -179,7 +172,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 
     public CardSnapShot? ToSnapShot(CardModel card)
     {
-        if (card == null) return null;
+        if (card == null || card.Dead) return null;
 
         return new CardSnapShot
         {
@@ -187,5 +180,32 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             Attack = card.AttackDamage,
             Health = card.Health,
         };
+    }
+
+    public void RemoveCardFromLane(CardModel deadCard)
+    {
+        for(int i = 0; i < logicLanes.Count; i++ )
+        {
+            Lane lane = logicLanes[i];
+
+            if (lane.EnemyActiveCard == deadCard)
+            {
+                lane.EnemyActiveCard = null;
+            }
+            else if(lane.PlayerActiveCard == deadCard)
+            {
+                lane.PlayerActiveCard = null;
+            }
+            else if(lane.EnemyQueuedCard == deadCard)
+            {
+                lane.EnemyQueuedCard = null;
+            }
+            else
+            {
+                continue;
+            }
+            logicLanes[i] = lane;
+            return;
+        }
     }
 }

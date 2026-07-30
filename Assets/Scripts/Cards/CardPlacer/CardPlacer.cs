@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CardPlacer
 {
-    public async Task HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
+    public async void HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
     {
         if (card == null)
         {

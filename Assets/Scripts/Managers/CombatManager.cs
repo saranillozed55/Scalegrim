@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatManager : GenericSingleton<CombatManager>
@@ -30,9 +32,10 @@ public class CombatManager : GenericSingleton<CombatManager>
         if (IsInCombat) return;
 
         IsInCombat = true;
-        
+
         //player cards move
-        foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
+        List<Lane> lanesSanpShot = new List<Lane>(BoardLaneManager.Instance.LogicLanes);
+        foreach (Lane lane in lanesSanpShot)
         {
             if (lane.PlayerActiveCard != null && !lane.PlayerActiveCard.Dead)
             {
@@ -42,7 +45,7 @@ public class CombatManager : GenericSingleton<CombatManager>
         }
 
         //enemy cards move
-        foreach (Lane lane in BoardLaneManager.Instance.LogicLanes)
+        foreach (Lane lane in lanesSanpShot)
         {
             if (lane.EnemyActiveCard != null && !lane.EnemyActiveCard.Dead)
             {
@@ -56,6 +59,7 @@ public class CombatManager : GenericSingleton<CombatManager>
 
     public void EndCombat()
     {
+        Debug.Log("End Comabat Method raised");
         IsInCombat = false;
         _onEnemyEndTurn.RaiseEvent();
     }

@@ -1303,7 +1303,7 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 13000
+  m_ColorTemperature: 14000
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
@@ -2911,6 +2911,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndTurn
   _onEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
+  _onEndTurnSpeed: 0.5
 --- !u!1 &1196077339
 GameObject:
   m_ObjectHideFlags: 0
@@ -3963,11 +3964,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
   - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
   - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+  - {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
   _maxCards: 5
   _prepArea:
   - {fileID: 1835653811}
   - {fileID: 1015739483}
   - {fileID: 1196077341}
+  _enemyDeck: []
+  _bluePrints:
+  - {fileID: 11400000, guid: 9046233ccb7a1704686e87a0a896d59c, type: 2}
+  - {fileID: 11400000, guid: e7d817f560050aa4797ef7494edb6af6, type: 2}
   _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   DAMAGE_THRESHOLD: 3
   _aiProfile: {fileID: 11400000, guid: 9c38eb54a91449641bf6cd4127570608, type: 2}
