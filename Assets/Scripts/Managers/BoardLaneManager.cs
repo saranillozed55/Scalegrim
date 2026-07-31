@@ -67,9 +67,24 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 
     public async Task<bool> PlaceEnemyCardsInQueue(CardModel model, int laneIndex)
     {
+        if (model == null)
+        {
+            Debug.LogWarning("PlaceEnemyCardsInQueue: model is null");
+            return false;
+        }
+        if(model.ViewPrefab == null)
+        {
+            Debug.LogWarning($"PlaceEnemyCardsInQueue: Card ViewPrefab is null for card{model.Name}");
+            return false;
+        }
+        if (laneIndex < 0 || laneIndex >= _prepAreas?.Count)
+        {
+            Debug.LogWarning($"PlaceEnemyCardsInQueue: laneIndex {laneIndex} is out of range");
+            return false;
+        }
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
 
-        if (targetPrepArea != null && !targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
+        if (!targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
         {
             return false;
         }
@@ -180,6 +195,20 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             Attack = card.AttackDamage,
             Health = card.Health,
         };
+    }
+
+    public List<int> GetAvailableEnemyLanes()
+    {
+        List<int> availableLanes = new();
+
+        for(int i = 0; i < logicLanes.Count; i++)
+        {
+            if (!logicLanes[i].IsEnemySideOccupied)
+            {
+                availableLanes.Add(i);
+            }
+        }
+        return availableLanes; ;
     }
 
     public void RemoveCardFromLane(CardModel deadCard)

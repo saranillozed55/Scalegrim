@@ -15,11 +15,6 @@ public class PlayerDeck : MonoBehaviour
         InitalizeBaseDeck();
     }
 
-    private void Update()
-    {
-
-    }
-
     private void InitalizeBaseDeck()
     {
         for (int i = 0; i < _startingDeck.Count; i++)

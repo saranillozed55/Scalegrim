@@ -10,10 +10,6 @@ public class TestEnemy : MonoBehaviour
 {
     [SerializeField] private List<CardDataSO> _enemyCards;
 
-    [SerializeField] private int _maxCards = 5; // enemy shouldnt have _maxCards unless we want it to
-
-    [SerializeField] private List<EnemyPrepArea> _prepArea;
-
     [SerializeField] private List<CardModel> _enemyDeck = new();
 
     [Header("Blueprint list")]
@@ -37,13 +33,13 @@ public class TestEnemy : MonoBehaviour
 
     private void OnEnable()
     {
-        _onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
+        //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
         _onEnemyEndTurn.onEventRaised += OpponentTurn;
     }
 
     private void OnDisable()
     {
-        _onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
+        //_onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
         _onEnemyEndTurn.onEventRaised -= OpponentTurn;
     }
 
@@ -53,8 +49,8 @@ public class TestEnemy : MonoBehaviour
         OnCombatStart();
         cardRetriever = new CardRetriever(_enemyDeck);
 
-        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
-        cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
+        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
+        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
     }
 
     private void InitBaseDeck() // won't be using this anymore because will have blueprints later on
@@ -85,6 +81,7 @@ public class TestEnemy : MonoBehaviour
         }
 
         int random = Random.Range(0, _bluePrints.Count);
+
         Blueprint blueprint = _bluePrints[random];
         Debug.Log($"Blueprint chosen: {blueprint.name}");
         enemyTurnQueue.GenerateEnemyQueue(blueprint);
@@ -92,7 +89,35 @@ public class TestEnemy : MonoBehaviour
 
     private void OpponentTurn()
     {
+        BlueprintTurn blueprint = enemyTurnQueue.GetTurnBlueprint();
         
+        if(blueprint == null)
+        {
+            Debug.Log("Enemy will have to surrender, no more turns");
+            return;
+        }
+        List<int> availableLanes = BoardLaneManager.Instance.GetAvailableEnemyLanes();
+        foreach(BlueprintEntry turn in blueprint.Entries)
+        {
+            //check what type the entry is
+            //if the entry type is random, call a different function to get a random card from that "tribe" or whatever its called
+            EntryType type = turn.type;
+            CardModel model = new CardModel(turn.card);
+            if(type == EntryType.ExactCard)
+            {
+                int randomIndex = Random.Range(0, availableLanes.Count);
+                int lane = availableLanes[randomIndex];
+
+                availableLanes.RemoveAt(randomIndex);
+
+                _ = cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
+                Debug.Log($"Type: {type}, Card Name: {turn.card.name}.");
+            }
+            else
+            {
+                Debug.Log($"Type was not ExactCard, will implement soon. {type}");
+            }
+        }
     }
 
     private void QueueNextCardInLane()
@@ -114,7 +139,7 @@ public class TestEnemy : MonoBehaviour
 
                 if (currentStrongestCard != null)
                 {
-                    cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
+                    _ = cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
                 }
                 continue;
             }
@@ -134,7 +159,7 @@ public class TestEnemy : MonoBehaviour
                     {
                         Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
 
-                        cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
+                        _ = cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
                         break;
                     }
                     else if (!lane.PlayerCard.HasValue)
