@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ public class BlueprintEntry
 public enum EntryType
 {
     ExactCard,
-    RandomCost,
-    RandomTribe, // probably won't be using RandomTribe, maybe random something else(RandomSchool?)
-    RandomAny
+    RandomCost, // random cost card from a specific group( or not)
+    RandomGroup, // random card from a specific group
+    RandomFromAny, // random card from list of cards
 }

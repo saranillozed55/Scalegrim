@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDatabaseSO
   _allCards:
   - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+  - {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
+  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
+  - {fileID: 11400000, guid: 54f87235694603a409227a23ae575626, type: 2}

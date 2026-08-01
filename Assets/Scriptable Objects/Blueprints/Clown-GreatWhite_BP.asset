@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 92ea53b30e9d0764aa0d65ec2dd93bd9, type: 3}
-  m_Name: Shark-Fish
+  m_Name: Clown-GreatWhite_BP
   m_EditorClassIdentifier: Assembly-CSharp::Blueprint
   Turns:
   - Entries:
     - type: 0
-      card: {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
+      card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
     - type: 0
       card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
   - Entries:
     - type: 0
       card: {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
     - type: 0
-      card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+      card: {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}

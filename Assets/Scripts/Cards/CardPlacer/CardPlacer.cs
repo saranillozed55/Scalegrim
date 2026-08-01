@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class CardPlacer
 {
-    public async Task HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
+    public async Task<bool> HandlePlaceCard(List<CardModel> enemyDeck, CardModel card, int laneIndex) // maybe change enemyDeck to pass in an object rather than list then in that class we can call method to remove the card. but for now is fine
     {
         if (card == null)
         {
             Debug.LogWarning($"HandlePlaceCard: Recieved null card, can't place card in Queue");
-            return;
+            return false;
         }
 
         bool placed = await BoardLaneManager.Instance.PlaceEnemyCardsInQueue(card, laneIndex);
@@ -23,5 +23,6 @@ public class CardPlacer
         {
             Debug.Log("This card can't be placed in queue because there is already a card in the active area");
         }
+        return placed;
     }
 }

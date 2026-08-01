@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 public enum CardPreference
 {
@@ -34,13 +35,13 @@ public class TestEnemy : MonoBehaviour
     private void OnEnable()
     {
         //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
-        _onEnemyEndTurn.onEventRaised += OpponentTurn;
+        _onEnemyEndTurn.onEventRaised += OnEnemyEndTurnHandler;
     }
 
     private void OnDisable()
     {
         //_onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
-        _onEnemyEndTurn.onEventRaised -= OpponentTurn;
+        _onEnemyEndTurn.onEventRaised -= OnEnemyEndTurnHandler;
     }
 
     private void Start()
@@ -55,9 +56,9 @@ public class TestEnemy : MonoBehaviour
 
     private void InitBaseDeck() // won't be using this anymore because will have blueprints later on
     {
-        for(int i = 0; i < _enemyCards.Count; i++)
+        for (int i = 0; i < _enemyCards.Count; i++)
         {
-            _enemyDeck.Add(new CardModel(_enemyCards[i])); 
+            _enemyDeck.Add(new CardModel(_enemyCards[i]));
         }
     }
 
@@ -87,37 +88,55 @@ public class TestEnemy : MonoBehaviour
         enemyTurnQueue.GenerateEnemyQueue(blueprint);
     }
 
-    private void OpponentTurn()
+    private async void OnEnemyEndTurnHandler()
+    {
+        // call the async Task<bool> method and ignore the returned value
+        await OpponentTurnPerformed(); // result is ignored but can handle if needed, not much different from _ = 
+    }
+
+    //this won't be in this script this is still a test script, but this is the main logic for the AI to decide what to do on its turn
+    private async Task<bool> OpponentTurnPerformed()
     {
         BlueprintTurn blueprint = enemyTurnQueue.GetTurnBlueprint();
-        
-        if(blueprint == null)
+
+        if (blueprint == null)
         {
             Debug.Log("Enemy will have to surrender, no more turns");
-            return;
+            //surrender logic here
+            return false;
         }
+
         List<int> availableLanes = BoardLaneManager.Instance.GetAvailableEnemyLanes();
-        foreach(BlueprintEntry turn in blueprint.Entries)
+
+        foreach (BlueprintEntry turn in blueprint.Entries)
         {
             //check what type the entry is
             //if the entry type is random, call a different function to get a random card from that "tribe" or whatever its called
             EntryType type = turn.type;
-            CardModel model = new CardModel(turn.card);
-            if(type == EntryType.ExactCard)
+
+            int randomIndex = Random.Range(0, availableLanes.Count);
+            int lane = availableLanes[randomIndex];
+
+            bool wasPlaced = false;
+
+            availableLanes.RemoveAt(randomIndex); // move this after wasPlaced so we can remove the lane if the card was placed successfully
+
+            if (type == EntryType.ExactCard)
             {
-                int randomIndex = Random.Range(0, availableLanes.Count);
-                int lane = availableLanes[randomIndex];
+                CardModel model = new CardModel(turn.card);
 
-                availableLanes.RemoveAt(randomIndex);
-
-                _ = cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
+                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
                 Debug.Log($"Type: {type}, Card Name: {turn.card.name}.");
             }
-            else
+            else if (type == EntryType.RandomGroup)
             {
-                Debug.Log($"Type was not ExactCard, will implement soon. {type}");
+
+                 
+                Debug.Log($"Type: {type}, Random group - random card from group will be taken");
             }
+
         }
+        return true;
     }
 
     private void QueueNextCardInLane()

@@ -6,6 +6,7 @@ using UnityEngine;
 public class CardDatabaseSO : ScriptableObject
 {
     [SerializeField] private List<CardDataSO> _allCards = new();
+    public IReadOnlyCollection<CardDataSO> AllCards => _allCards;
 
     public CardDataSO GetCardById(string cardId)
     {
