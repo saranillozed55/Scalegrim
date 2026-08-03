@@ -56,5 +56,7 @@ public class CardRetriever
         return null;
     }
 
+    //public CardModel GetCardModel<T> (T )
+
     //public 
 }

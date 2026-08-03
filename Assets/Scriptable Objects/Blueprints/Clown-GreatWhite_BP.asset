@@ -15,11 +15,12 @@ MonoBehaviour:
   Turns:
   - Entries:
     - type: 0
+      group: 0
       card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
     - type: 0
+      group: 0
       card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
   - Entries:
-    - type: 0
-      card: {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
-    - type: 0
-      card: {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
+    - type: 2
+      group: 1
+      card: {fileID: 0}

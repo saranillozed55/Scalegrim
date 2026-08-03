@@ -30,6 +30,9 @@ public class TestEnemy : MonoBehaviour
     EnemyTurnQueue enemyTurnQueue = new EnemyTurnQueue();
     CardRetriever cardRetriever;
 
+    [Header("Testing references")]
+    [SerializeField] private CardGroupRetriever cardGroupRetriever;
+
     private int turnsPassed = 0;
 
     private void OnEnable()
@@ -119,20 +122,48 @@ public class TestEnemy : MonoBehaviour
 
             bool wasPlaced = false;
 
-            availableLanes.RemoveAt(randomIndex); // move this after wasPlaced so we can remove the lane if the card was placed successfully
+            //availableLanes.RemoveAt(randomIndex); // move this after wasPlaced so we can remove the lane if the card was placed successfully
 
             if (type == EntryType.ExactCard)
             {
-                CardModel model = new CardModel(turn.card);
+                Debug.Log($"Type: {type}, Card Name: {turn.card.name}, Card Group: {turn.card.Group}");
 
+                CardModel model = new CardModel(turn.card);
                 wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
-                Debug.Log($"Type: {type}, Card Name: {turn.card.name}.");
             }
             else if (type == EntryType.RandomGroup)
             {
 
-                 
-                Debug.Log($"Type: {type}, Random group - random card from group will be taken");
+                Debug.Log($"Type: {type}, Group {turn.group}- random card from group will be taken");
+
+                // implement GetCardFromGroup method in CardRetriever class to get a random card from the group 
+                List<CardDataSO> cards = cardGroupRetriever.GetCardsByGroup(turn.group);
+                CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
+                CardModel model = new CardModel(randomCard);
+
+                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
+            }
+            else if (type == EntryType.RandomFromAny)
+            {
+                if (turn.cardListFromAny == null || turn.cardListFromAny.Count == 0)
+                {
+                    Debug.LogWarning($"Blueprint entry: {turn} has an empty card list");
+                    continue;
+                }
+
+                List<CardDataSO> cards = cardGroupRetriever.GetCardsFromAnyInList(turn.cardListFromAny);
+                CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
+                CardModel model = new CardModel(randomCard);
+
+                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane); // REMOVE _enemyDeck from this method
+            }
+
+
+
+            if(wasPlaced)
+            {
+                availableLanes.RemoveAt(randomIndex); // remove the lane from available lanes if the card was placed successfully
+                Debug.Log($"Card was sucessfully placed in lane {lane + 1}");
             }
 
         }

@@ -17,7 +17,7 @@ public class CardPlacer
 
         if (placed)
         {
-            enemyDeck.Remove(card);
+            enemyDeck.Remove(card); // Don't use enemy deck anymore because we have blueprints
         }
         else
         {

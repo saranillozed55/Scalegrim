@@ -585,7 +585,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPrepArea
   _frontCardDropArea: {fileID: 1407771034}
-  _parentLaneView: {fileID: 0}
   _cardSpawnLocation: {fileID: 81883819}
 --- !u!64 &165595512
 MeshCollider:
@@ -2234,6 +2233,9 @@ MonoBehaviour:
   _startingDeck:
   - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
   - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+  - {fileID: 11400000, guid: 54f87235694603a409227a23ae575626, type: 2}
+  - {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
+  - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
 --- !u!1 &927112455
 GameObject:
   m_ObjectHideFlags: 0
@@ -2345,7 +2347,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPrepArea
   _frontCardDropArea: {fileID: 1805645113}
-  _parentLaneView: {fileID: 0}
   _cardSpawnLocation: {fileID: 30038131}
 --- !u!64 &1015739484
 MeshCollider:
@@ -2961,7 +2962,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPrepArea
   _frontCardDropArea: {fileID: 1029095369}
-  _parentLaneView: {fileID: 0}
   _cardSpawnLocation: {fileID: 1075040074}
 --- !u!64 &1196077342
 MeshCollider:
@@ -3961,15 +3961,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemy
   _enemyCards:
-  - {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
-  - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
-  - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
   - {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
-  _maxCards: 5
-  _prepArea:
-  - {fileID: 1835653811}
-  - {fileID: 1015739483}
-  - {fileID: 1196077341}
+  - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
   _enemyDeck: []
   _bluePrints:
   - {fileID: 11400000, guid: 9046233ccb7a1704686e87a0a896d59c, type: 2}
@@ -3977,6 +3970,7 @@ MonoBehaviour:
   _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   DAMAGE_THRESHOLD: 3
   _aiProfile: {fileID: 11400000, guid: 9c38eb54a91449641bf6cd4127570608, type: 2}
+  cardGroupRetriever: {fileID: 11400000, guid: 9f0e1581d9deff348bc74b6b60302c5b, type: 2}
 --- !u!1 &1792256781
 GameObject:
   m_ObjectHideFlags: 0
@@ -4333,7 +4327,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyPrepArea
   _frontCardDropArea: {fileID: 2122590516}
-  _parentLaneView: {fileID: 0}
   _cardSpawnLocation: {fileID: 927112456}
 --- !u!64 &1835653812
 MeshCollider:

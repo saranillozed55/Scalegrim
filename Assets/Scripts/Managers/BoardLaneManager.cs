@@ -89,6 +89,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             return false;
         }
 
+        //fix this to instantiate under a parent object for organization
         CardView instance = Instantiate(model.ViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
         instance.InitCard(model);
         instance.CardModel.PlayCard();

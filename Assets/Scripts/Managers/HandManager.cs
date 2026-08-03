@@ -28,7 +28,6 @@ public class HandManager : GenericSingleton<HandManager>
 
     private MousePosition _mousePosition;
 
-    private bool _allowCardHover = true;
     private CardView _currentHoveredCard;
     private List<CardView> _handCards = new();
 
@@ -45,10 +44,7 @@ public class HandManager : GenericSingleton<HandManager>
             ClearCards();
         }
 
-        if (_allowCardHover)
-        {
-            HandleCardHover();
-        }
+        HandleCardHover();
     }
 
     private void OnEnable()
@@ -74,21 +70,22 @@ public class HandManager : GenericSingleton<HandManager>
         CurrentHandState = HandState.InHand; // change
         InputManager.Instance.OnBackButtonPressed += SelectionManager.Instance.DeselectCard;
     }
-
-    public bool DrawCard(CardView newCard)
+    public async Task<bool> DrawCard(CardView newCard)
     {
         if (newCard == null) return false;
         if (_handCards.Count >= maxHandSize) return false;
         _handCards.Add(newCard);
         newCard.CardModel.SetHoverable(false);
-        
-        UpdateCardPosition();
+
+        await UpdateCardPosition();
         return true;
     }
 
-    private async void UpdateCardPosition()
+    private async Task UpdateCardPosition()
     {
         Vector3 handCenter = _handPosition.position;
+
+        List<Task> tasks = new();
 
         for (int i = 0; i < _handCards.Count; i++)
         {
@@ -98,24 +95,23 @@ public class HandManager : GenericSingleton<HandManager>
             // last card (highest index) is closest to camera
             position -= _fpCamera.transform.forward * (i * 0.01f);
 
-            //MOVE THIS TO CARDVIEW I BELIEVE
             CardView cardView = _handCards[i];
             cardView.SetBasePosition(position);
             cardView.SetBaseRotation(_handPosition.rotation);
 
-            try
-            {
-                await cardView.MoveCardToPosition(position, _handPosition.rotation);
-                cardView.CardModel.SetHoverable(true);
-            }
-            catch(Exception e)
-            {
-                Debug.LogError("Error[Hand Manager]: " + e);
-            }
+            tasks.Add(cardView.MoveCardToPosition(position, _handPosition.rotation));
+            //cardView.CardModel.SetHoverable(true);
+        }
+
+        await Task.WhenAll(tasks);
+
+        foreach(var card in _handCards)
+        {
+            card.CardModel.SetHoverable(true);
         }
     }
 
-    private void HandleCardHover()
+    private void HandleCardHover() // maybe move this to not in manager and let card view handle its own hover state, but manager can handle the raycast and tell the card to hover
     {
         if (Physics.Raycast(_mousePosition.GetMouseRay(), out RaycastHit hit, Mathf.Infinity, _cardLayer))
         {
@@ -162,34 +158,22 @@ public class HandManager : GenericSingleton<HandManager>
         _handCards.Clear();
     }
 
-    public async void CardTempLeave(CardView card)
+    public void CardTempLeave(CardView card)
     {
-        _allowCardHover = false;
         _handCards.Remove(card);
 
         SwitchHandState(HandState.Selected);
 
-        try
-        {
-           await card.MoveCardToPosition(_viewToUsePoint.position, CardRotations._cardFaceFlatUp);
-        }
-
-        catch(Exception e)
-        {
-            Debug.LogError("Error[Hand Manager]: " + e.Message);
-        }
+        _ = card.MoveCardToPosition(_viewToUsePoint.position, CardRotations._cardFaceFlatUp);
     }
 
     public async Task CardBackToHand(CardView card)
     {
         _handCards.Add(card);
 
-        await card.RotateCard(card.BaseRotation);
-
-        _allowCardHover = true;
-
         SwitchHandState(HandState.InHand);
-        UpdateCardPosition();
+
+        await UpdateCardPosition();
     }
 
     public async Task PlayCurrentCard(CardDropArea targetArea)
@@ -203,18 +187,9 @@ public class HandManager : GenericSingleton<HandManager>
         await playedCard.MoveCardToPosition(targetArea.transform.position);
         playedCard.CardModel.PlayCard();
         targetArea.OnCardDrop(playedCard);
-        _allowCardHover = true;
-
-        //playedCard.transform.DOKill();
-        //playedCard.transform.DOMove(targetArea.transform.position, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
-        //{
-        //    playedCard.CardModel.PlayCard();
-        //    targetArea.OnCardDrop(playedCard);
-        //    _allowCardHover = true;
-        //});
 
         SwitchHandState(HandState.InHand);
-        UpdateCardPosition();
+        await UpdateCardPosition();
     }
 
     public void SwitchHandState(HandState state)

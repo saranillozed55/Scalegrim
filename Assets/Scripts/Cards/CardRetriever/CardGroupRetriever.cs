@@ -5,13 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CardGroupRetriever")]
 public class CardGroupRetriever : ScriptableObject
 {
-    [SerializeField] public CardDatabaseSO _dataBase;
+    [SerializeField] private CardDatabaseSO _dataBase;
 
     private Dictionary<Group, List<CardDataSO>> _cardsByGroup;
 
     private void OnEnable()
     {
-        _cardsByGroup.Clear();
+        if (_cardsByGroup != null)
+        {
+            _cardsByGroup.Clear();
+        }
         _cardsByGroup = new();
 
         _cardsByGroup = _dataBase.AllCards.GroupBy(card => card.Group).ToDictionary(group => group.Key, group => group.ToList());
@@ -23,9 +26,18 @@ public class CardGroupRetriever : ScriptableObject
         // Each group has a Key so group.Key and the value is the group.ToList() so it then creates the dictionary with the key and value.
     }
 
-    //private List<CardDataSO> GetCardsByGroup(Group group)
-    //{
-        
-    //}
+    public List<CardDataSO> GetCardsByGroup(Group group)
+    {
+        if (_cardsByGroup.TryGetValue(group, out var cards))
+        {
+            return cards;
+        }
+        return new List<CardDataSO>();
+    }
+
+    public List<CardDataSO> GetCardsFromAnyInList(List<CardDataSO> cards)
+    {
+        return null;
+    }
 
 }

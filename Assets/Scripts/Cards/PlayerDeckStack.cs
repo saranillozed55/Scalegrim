@@ -37,6 +37,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     public void LoadDeck(List<CardModel> deckCards)
     {
+        deckCards.Shuffle();
         for (int i = 0; i < deckCards.Count; i++)
         {
             CardView instance = Instantiate(deckCards[i].ViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
@@ -54,23 +55,31 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
         _stackLoaded = true;
     }
 
-    public void OnClick()
+    public async void OnClick() //event handler is fine for async void in this case since we don't need to await it
     {
         if (_isPopping) return;
         if (_deckCards.Count == 0) return;
 
         _isPopping = true;
 
-        CardView poppedCard = _deckCards.Pop();
-        bool drawn = HandManager.Instance.DrawCard(poppedCard);
-
-        if (!drawn)
+        try
         {
-            _deckCards.Push(poppedCard);
-        }
+            CardView poppedCard = _deckCards.Pop();
+            bool drawn = await HandManager.Instance.DrawCard(poppedCard);
 
-        //small delay matching draw tween so that we don't double click and it pops twice
-        DOVirtual.DelayedCall(0.15f, () => _isPopping = false);
+            if (!drawn)
+            {
+                _deckCards.Push(poppedCard);
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error popping card from deck: {ex.Message}");
+        }
+        finally
+        {
+            _isPopping = false;
+        }
     }
 
     public void ClearDeckStack()

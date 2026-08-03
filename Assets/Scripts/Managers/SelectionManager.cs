@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class SelectionManager : GenericSingleton<SelectionManager>
@@ -9,13 +10,13 @@ public class SelectionManager : GenericSingleton<SelectionManager>
     public void OnCardClicked(CardView card)
     {
         //ignore if we don't want to click on cards while not player turn
-        if(TurnManager.Instance.CurrentTurnState != TurnState.PlayerTurn)
+        if (TurnManager.Instance.CurrentTurnState != TurnState.PlayerTurn)
         {
             return;
         }
 
         //clicking same card deselects it
-        if(card == SelectedHandCard)
+        if (card == SelectedHandCard)
         {
             DeselectCard();
             return;
@@ -42,28 +43,24 @@ public class SelectionManager : GenericSingleton<SelectionManager>
         //change camera
     }
 
-    public async void DeselectCard()
+    public void DeselectCard()
     {
-        if (SelectedHandCard == null) return;
-
+        if (SelectedHandCard == null)
+        {
+            return;
+        }
 
         SelectedHandCard.Deselect();
-
+        _ = HandManager.Instance.CardBackToHand(SelectedHandCard);
         SelectedHandCard = null;
-
-        CinemachineSwitcher.Instance.FocusFPCameraView();
         //change camera
-        try
-        {
-            await HandManager.Instance.CardBackToHand(SelectedHandCard);
-        }
-        catch(Exception e)
-        {
-            Debug.LogError("Error[Selection Manager]: " + e.Message);
-        }
+        CinemachineSwitcher.Instance.FocusFPCameraView();
     }
     public void CardPlayedDeselect()
     {
+        if(SelectedHandCard == null) {
+            return;
+        }
         SelectedHandCard.Deselect();
         SelectedHandCard = null;
         CinemachineSwitcher.Instance.FocusFPCameraView();
