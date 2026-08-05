@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class BoardEvaluater
 {
-    public float EvaluateLane(AIPersonality profile, LaneSnapShot lane)
+    public float EvaluateLane(AIPersonality profile, LaneSnapShot lane) // Evaluate lane based on AI personality profile and with EnemyAttackPreference use it to multiply the score of the lane
+
     {
         float laneScore = 0f;
 
-        bool hasAiCard = lane.EnemyCard.HasValue;
+        bool hasEnemyCard = lane.EnemyCard.HasValue;
         bool hasPlayerCard = lane.PlayerCard.HasValue;
 
         float defense = profile.DefensiveMultiplier;
@@ -14,7 +15,7 @@ public class BoardEvaluater
 
 
         //Enemy and Card in Play Areas
-        if (hasAiCard && hasPlayerCard)
+        if (hasEnemyCard && hasPlayerCard)
         {
             CardSnapShot playerCard = lane.PlayerCard.Value;
             CardSnapShot enemyCard = lane.EnemyCard.Value;
@@ -29,7 +30,7 @@ public class BoardEvaluater
         }
 
         //No Enemy Card but there is Player Card in play
-        else if (!hasAiCard && hasPlayerCard)
+        else if (!hasEnemyCard && hasPlayerCard)
         {
             Debug.Log($"<color=green> Only Player has a card in lane {lane.LaneIndex + 1}! Player can attack enemy directly! </color>");
 
@@ -39,7 +40,7 @@ public class BoardEvaluater
         }
 
         //no player card in lane
-        else if (hasAiCard && !hasPlayerCard)
+        else if (hasEnemyCard && !hasPlayerCard)
         {
             CardSnapShot enemyCard = lane.EnemyCard.Value;
             Debug.Log($"<color=green> No cards in lane {lane.LaneIndex + 1}. Enemy can attack player directly! </color>");

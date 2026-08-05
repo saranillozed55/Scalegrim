@@ -1,23 +1,19 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-public enum CardPreference
-{
-    OVERPOWER,
-    TANK,
-}
 
 public class TestEnemy : MonoBehaviour
 {
-    [SerializeField] private List<CardDataSO> _enemyCards;
-
-    [SerializeField] private List<CardModel> _enemyDeck = new();
-
     [Header("Blueprint list")]
     [SerializeField] private List<Blueprint> _bluePrints;
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
+
+    //This specific broadcast should be use for all enemies since all enemies will have the same logic, except for bosses
+    [Header("Broadcast to Event Channels")]
+    [SerializeField] private VoidEventChannel _onSurrenderPerformed;
 
     [Header("Settings for Next Card Moves")]
     [SerializeField] private float DAMAGE_THRESHOLD = 5f;
@@ -32,6 +28,7 @@ public class TestEnemy : MonoBehaviour
 
     [Header("Testing references")]
     [SerializeField] private CardGroupRetriever cardGroupRetriever;
+    private Dictionary<int, List<Blueprint>> _blueprintsByDifficutly; 
 
     private int turnsPassed = 0;
 
@@ -39,6 +36,14 @@ public class TestEnemy : MonoBehaviour
     {
         //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
         _onEnemyEndTurn.onEventRaised += OnEnemyEndTurnHandler;
+
+        if (_blueprintsByDifficutly != null)
+        {
+            _blueprintsByDifficutly.Clear();
+        }
+        _blueprintsByDifficutly = new();
+
+        _blueprintsByDifficutly = _bluePrints.GroupBy(blueprint => blueprint.difficultyLevelOfBlueprint).ToDictionary(group => group.Key, group => group.ToList());
     }
 
     private void OnDisable()
@@ -49,20 +54,8 @@ public class TestEnemy : MonoBehaviour
 
     private void Start()
     {
-        InitBaseDeck();
         OnCombatStart();
-        cardRetriever = new CardRetriever(_enemyDeck);
-
-        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[0], 0);
-        _ = cardPlacer.HandlePlaceCard(_enemyDeck, _enemyDeck[1], 1);
-    }
-
-    private void InitBaseDeck() // won't be using this anymore because will have blueprints later on
-    {
-        for (int i = 0; i < _enemyCards.Count; i++)
-        {
-            _enemyDeck.Add(new CardModel(_enemyCards[i]));
-        }
+        OnEnemyEndTurnHandler();
     }
 
     private BoardState CheckCurrentBoardState()
@@ -76,18 +69,42 @@ public class TestEnemy : MonoBehaviour
         return currState;
     }
 
+    private int ChooseDifficultyLevel()
+    {
+        //this should be based on the player's performance and how far they have progressed in the game
+        return 1; //currently testing
+    }
+    private int GetDifficultyLevel()
+    {
+        return 1;
+    }
+    private List<Blueprint> GetBlueprintsByDifficultyWithRandom(int difficultyLevel)
+    {
+        List<List<Blueprint>> blueprints = _blueprintsByDifficutly.Where(value => value.Key == difficultyLevel).Select(value => value.Value).ToList();
+
+        if (blueprints.Count > 0)
+        {
+            return blueprints[Random.Range(0, blueprints.Count)];
+        }
+
+        return new List<Blueprint>();
+    }
+
     private void OnCombatStart()
     {
         if (_bluePrints.Count <= 0)
         {
             Debug.Log("No blueprints in enemy list");
+
             return;
         }
 
-        int random = Random.Range(0, _bluePrints.Count);
+        List<Blueprint> blueprintsByDifficulty = GetBlueprintsByDifficultyWithRandom(GetDifficultyLevel());
 
-        Blueprint blueprint = _bluePrints[random];
-        Debug.Log($"Blueprint chosen: {blueprint.name}");
+        int random = Random.Range(0, blueprintsByDifficulty.Count);
+        Blueprint blueprint = blueprintsByDifficulty[random];
+
+        Debug.Log($"Blueprint chosen: {blueprint.name}, Difficulty: {blueprint.difficultyLevelOfBlueprint}");
         enemyTurnQueue.GenerateEnemyQueue(blueprint);
     }
 
@@ -105,7 +122,7 @@ public class TestEnemy : MonoBehaviour
         if (blueprint == null)
         {
             Debug.Log("Enemy will have to surrender, no more turns");
-            //surrender logic here
+            _onSurrenderPerformed.RaiseEvent();
             return false;
         }
 
@@ -116,20 +133,21 @@ public class TestEnemy : MonoBehaviour
             //check what type the entry is
             //if the entry type is random, call a different function to get a random card from that "tribe" or whatever its called
             EntryType type = turn.type;
+            EnemyAttackPreference preference = turn.enemyAttackPreference;
 
             int randomIndex = Random.Range(0, availableLanes.Count);
             int lane = availableLanes[randomIndex];
 
             bool wasPlaced = false;
 
-            //availableLanes.RemoveAt(randomIndex); // move this after wasPlaced so we can remove the lane if the card was placed successfully
-
             if (type == EntryType.ExactCard)
             {
+                //Preference here?
+
                 Debug.Log($"Type: {type}, Card Name: {turn.card.name}, Card Group: {turn.card.Group}");
 
                 CardModel model = new CardModel(turn.card);
-                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
+                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
             }
             else if (type == EntryType.RandomGroup)
             {
@@ -141,7 +159,7 @@ public class TestEnemy : MonoBehaviour
                 CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
                 CardModel model = new CardModel(randomCard);
 
-                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane);
+                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
             }
             else if (type == EntryType.RandomFromAny)
             {
@@ -155,7 +173,7 @@ public class TestEnemy : MonoBehaviour
                 CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
                 CardModel model = new CardModel(randomCard);
 
-                wasPlaced = await cardPlacer.HandlePlaceCard(_enemyDeck, model, lane); // REMOVE _enemyDeck from this method
+                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane); // REMOVE _enemyDeck from this method
             }
 
 
@@ -166,68 +184,70 @@ public class TestEnemy : MonoBehaviour
                 Debug.Log($"Card was sucessfully placed in lane {lane + 1}");
             }
 
+            turnsPassed++;
+
         }
         return true;
     }
 
-    private void QueueNextCardInLane()
-    {
-        List<LaneSnapShot> lanes = CheckCurrentBoardState().Lanes;
+    //private void QueueNextCardInLane()
+    //{
+    //    List<LaneSnapShot> lanes = CheckCurrentBoardState().Lanes;
 
-        foreach (LaneSnapShot lane in lanes) // O(n) since only have max 4 lanes
-        {
-            //float score = EvaluateLane(lane);
-            float score = eval.EvaluateLane(_aiProfile, lane);
+    //    foreach (LaneSnapShot lane in lanes) // O(n) since only have max 4 lanes
+    //    {
+    //        //float score = EvaluateLane(lane);
+    //        float score = eval.EvaluateLane(_aiProfile, lane);
 
-            if (score >= 15)
-            {
-                Debug.Log($"<color=yellow> Lane {lane.LaneIndex + 1} has a score of {score} >= 15. Queuing strongest card available in this lane.</color>");
+    //        if (score >= 15)
+    //        {
+    //            Debug.Log($"<color=yellow> Lane {lane.LaneIndex + 1} has a score of {score} >= 15. Queuing strongest card available in this lane.</color>");
 
-                CardModel currentStrongestCard = null;
-                CardModel retrievedCard = cardRetriever.RetrieveCard(_aiProfile, lane);
-                currentStrongestCard = retrievedCard;
+    //            CardModel currentStrongestCard = null;
+    //            CardModel retrievedCard = cardRetriever.RetrieveCard(_aiProfile, lane);
+    //            currentStrongestCard = retrievedCard;
 
-                if (currentStrongestCard != null)
-                {
-                    _ = cardPlacer.HandlePlaceCard(_enemyDeck, currentStrongestCard, lane.LaneIndex);
-                }
-                continue;
-            }
+    //            if (currentStrongestCard != null)
+    //            {
+    //                _ = cardPlacer.HandlePlaceCard(currentStrongestCard, lane.LaneIndex);
+    //            }
+    //            continue;
+    //        }
 
-            else if (score > DAMAGE_THRESHOLD)
-            {
-                Debug.Log($"<color=yellow>Lane {lane.LaneIndex + 1} has a score of {score}. Queueing next card in this lane.</color>");
+    //        else if (score > DAMAGE_THRESHOLD)
+    //        {
+    //            Debug.Log($"<color=yellow>Lane {lane.LaneIndex + 1} has a score of {score}. Queueing next card in this lane.</color>");
 
-                foreach (CardModel card in _enemyDeck)
-                {
-                    if (card == null)
-                    {
-                        Debug.LogWarning($"Card that is being accessed is null");
-                        continue;
-                    }
-                    if (lane.PlayerCard.HasValue && (card.Health > lane.PlayerCard.Value.Attack))
-                    {
-                        Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
+    //            foreach (CardModel card in _enemyDeck)
+    //            {
+    //                if (card == null)
+    //                {
+    //                    Debug.LogWarning($"Card that is being accessed is null");
+    //                    continue;
+    //                }
+    //                if (lane.PlayerCard.HasValue && (card.Health > lane.PlayerCard.Value.Attack))
+    //                {
+    //                    Debug.Log($"<color=cyan> This Card '{card.Name}' has enough health to survive the player's attack. Queueing this card in lane {lane.LaneIndex + 1}.</color>");
 
-                        _ = cardPlacer.HandlePlaceCard(_enemyDeck, card, lane.LaneIndex);
-                        break;
-                    }
-                    else if (!lane.PlayerCard.HasValue)
-                    {
-                        Debug.Log($"<color=cyan> There is no Player Card in this lane {lane.LaneIndex + 1}.</color>");
-                        break;
-                    }
-                    else
-                    {
-                        Debug.Log($"<color=cyan> This card '{card.Name}' can't survive player attack");
-                    }
-                }
-            }
+    //                    _ = cardPlacer.HandlePlaceCard(card, lane.LaneIndex);
+    //                    break;
+    //                }
+    //                else if (!lane.PlayerCard.HasValue)
+    //                {
+    //                    Debug.Log($"<color=cyan> There is no Player Card in this lane {lane.LaneIndex + 1}.</color>");
+    //                    break;
+    //                }
+    //                else
+    //                {
+    //                    Debug.Log($"<color=cyan> This card '{card.Name}' can't survive player attack");
+    //                }
+    //            }
+    //        }i
 
-            else
-            {
-                Debug.Log($"<color=white>Lane {lane.LaneIndex + 1} has a score of {score}. Not queueing next card in this lane.</color>");
-            }
-        }
-    }
+    //        else
+    //        {
+    //            Debug.Log($"<color=white>Lane {lane.LaneIndex + 1} has a score of {score}. Not queueing next card in this lane.</color>");
+    //        }
+    //    }
+    //}
 }

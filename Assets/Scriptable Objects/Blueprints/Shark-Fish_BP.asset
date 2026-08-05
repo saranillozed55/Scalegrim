@@ -14,13 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Blueprint
   Turns:
   - Entries:
-    - type: 0
+    - card: {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
+      type: 0
       group: 0
-      card: {fileID: 11400000, guid: 2ac5a875485be284da1ee3947ffb502f, type: 2}
-    - type: 0
+      enemyAttackPreference: 0
+      cardListFromAny: []
+    - card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+      type: 0
       group: 0
-      card: {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+      enemyAttackPreference: 0
+      cardListFromAny: []
   - Entries:
-    - type: 2
+    - card: {fileID: 0}
+      type: 2
       group: 2
-      card: {fileID: 0}
+      enemyAttackPreference: 0
+      cardListFromAny: []
+  difficultyLevelOfBlueprint: 1

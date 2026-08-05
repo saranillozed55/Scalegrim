@@ -151,7 +151,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             dataLane.EnemyActiveCard = card.CardModel;
             dataLane.EnemyQueuedCard = null;
 
-            card.transform.DOKill();
             Transform targetLocation = view.EnemyActiveArea.transform;
             Quaternion targetRotation = CardRotations._cardFaceFlatUp; // WANT TO CHANGE THIS LATER TO MIMIC INSCRYPTION MAYBE
 

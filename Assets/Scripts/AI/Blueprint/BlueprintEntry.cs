@@ -6,9 +6,11 @@ using UnityEngine;
 [Serializable] 
 public class BlueprintEntry
 {
+
+    public CardDataSO card;
     public EntryType type;
     public Group group; // use for random group or random cost
-    public CardDataSO card;
+    public EnemyAttackPreference enemyAttackPreference; // use for any
 
     [Tooltip("Use for random cost or random from any")]
     public List<CardDataSO> cardListFromAny; 

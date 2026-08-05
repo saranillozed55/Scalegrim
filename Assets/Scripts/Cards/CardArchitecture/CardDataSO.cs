@@ -11,4 +11,6 @@ public class CardDataSO : ScriptableObject
     [field:SerializeField] public int AttackDamage { get; private set; }
     [field: SerializeField] public Group Group { get; private set; }
 
+    [field:SerializeField] public CardAudioProfileSO AudioProfile { get; private set; }
+
 }

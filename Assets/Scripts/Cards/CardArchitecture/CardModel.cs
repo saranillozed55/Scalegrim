@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public class CardModel
 {
-    private readonly CardDataSO cardData;
+    public readonly CardDataSO cardData;
 
     public bool CardPlaced { get; private set; }
     public bool CardSelected { get; private set; }

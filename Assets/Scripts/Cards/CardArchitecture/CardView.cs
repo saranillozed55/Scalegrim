@@ -54,14 +54,14 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         if (card.CardPlaced || !card.CardHoverable || IsAnimating) return;
 
         _hoverTween?.Kill();
-
+        AudioManager.Instance.Play(card.cardData, CardAudioType.Hover);
         _hoverTween = transform.DOMove(_basePosition + Vector3.up * 0.1f + Vector3.back * 0.02f, 0.2f);
     }
     public virtual void OnHoverExit()
     {
         if (card.CardPlaced || !card.CardHoverable || IsAnimating) return;
         _hoverTween?.Kill();
-
+        
         _hoverTween = transform.DOMove(_basePosition, 0.2f);
     }
     public virtual void OnClick()
@@ -107,12 +107,16 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     
     public async Task MoveCardToPosition(Vector3 targetPosition)
     {
-        transform.DOKill();
+        IsAnimating = true;
+        _moveTween?.Kill();
+        _rotateTween?.Kill();
 
         Sequence sequence = DOTween.Sequence();
         sequence.Join(transform.DOMove(targetPosition, 0.3f)); //magic number
 
         await sequence.AsyncWaitForCompletion();
+
+        IsAnimating = false;
     }
 
     public async Task MoveCardToPosition(Vector3 targetPosition, Quaternion targetRotation) // ADD DURATION TO THIS FLOAT
@@ -132,16 +136,18 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         await sequence.AsyncWaitForCompletion();
 
         IsAnimating = false;
-
     }
 
     public async Task RotateCard(Quaternion targetRotation)
     {
-        transform.DOKill();
+        IsAnimating = true;
+        _rotateTween?.Kill();
+
         Sequence sequence = DOTween.Sequence();
         sequence.Join(transform.DORotateQuaternion(targetRotation, 0.3f));
 
         await sequence.AsyncWaitForCompletion();
+        IsAnimating = false;
     }
 
 }
