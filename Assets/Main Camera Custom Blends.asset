@@ -16,8 +16,8 @@ MonoBehaviour:
   - From: FPView
     To: BoardView
     Blend:
-      Style: 1
-      Time: 0.35
+      Style: 2
+      Time: 0.4
       CustomCurve:
         serializedVersion: 2
         m_Curve: []
@@ -27,8 +27,8 @@ MonoBehaviour:
   - From: FPView
     To: PlayerHandCamera
     Blend:
-      Style: 5
-      Time: 0.5
+      Style: 2
+      Time: 0.4
       CustomCurve:
         serializedVersion: 2
         m_Curve: []

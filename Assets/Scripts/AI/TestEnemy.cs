@@ -6,12 +6,14 @@ using UnityEngine;
 public class TestEnemy : MonoBehaviour
 {
     [Header("Blueprint list")]
-    [SerializeField] private List<Blueprint> _bluePrints;
+    [SerializeField] private List<Blueprint> _bluePrints; // each enemy should have a list of blueprints, but for testing purposes we will have a list of blueprints in this script
+    //I believe after reaching a different point in the game, the enemy will get different blueprint lists 
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
     //This specific broadcast should be use for all enemies since all enemies will have the same logic, except for bosses
+
     [Header("Broadcast to Event Channels")]
     [SerializeField] private VoidEventChannel _onSurrenderPerformed;
 
@@ -27,8 +29,8 @@ public class TestEnemy : MonoBehaviour
     CardRetriever cardRetriever;
 
     [Header("Testing references")]
+    [SerializeField] private BlueprintRetriever blueprintRetriever;
     [SerializeField] private CardGroupRetriever cardGroupRetriever;
-    private Dictionary<int, List<Blueprint>> _blueprintsByDifficutly; 
 
     private int turnsPassed = 0;
 
@@ -36,14 +38,6 @@ public class TestEnemy : MonoBehaviour
     {
         //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
         _onEnemyEndTurn.onEventRaised += OnEnemyEndTurnHandler;
-
-        if (_blueprintsByDifficutly != null)
-        {
-            _blueprintsByDifficutly.Clear();
-        }
-        _blueprintsByDifficutly = new();
-
-        _blueprintsByDifficutly = _bluePrints.GroupBy(blueprint => blueprint.difficultyLevelOfBlueprint).ToDictionary(group => group.Key, group => group.ToList());
     }
 
     private void OnDisable()
@@ -54,6 +48,7 @@ public class TestEnemy : MonoBehaviour
 
     private void Start()
     {
+        blueprintRetriever.SetBlueprintsByDifficulty(_bluePrints);
         OnCombatStart();
         OnEnemyEndTurnHandler();
     }
@@ -74,20 +69,10 @@ public class TestEnemy : MonoBehaviour
         //this should be based on the player's performance and how far they have progressed in the game
         return 1; //currently testing
     }
+
     private int GetDifficultyLevel()
     {
         return 1;
-    }
-    private List<Blueprint> GetBlueprintsByDifficultyWithRandom(int difficultyLevel)
-    {
-        List<List<Blueprint>> blueprints = _blueprintsByDifficutly.Where(value => value.Key == difficultyLevel).Select(value => value.Value).ToList();
-
-        if (blueprints.Count > 0)
-        {
-            return blueprints[Random.Range(0, blueprints.Count)];
-        }
-
-        return new List<Blueprint>();
     }
 
     private void OnCombatStart()
@@ -99,10 +84,7 @@ public class TestEnemy : MonoBehaviour
             return;
         }
 
-        List<Blueprint> blueprintsByDifficulty = GetBlueprintsByDifficultyWithRandom(GetDifficultyLevel());
-
-        int random = Random.Range(0, blueprintsByDifficulty.Count);
-        Blueprint blueprint = blueprintsByDifficulty[random];
+        Blueprint blueprint = blueprintRetriever.GetBlueprintByDifficultyAndRandom(GetDifficultyLevel());
 
         Debug.Log($"Blueprint chosen: {blueprint.name}, Difficulty: {blueprint.difficultyLevelOfBlueprint}");
         enemyTurnQueue.GenerateEnemyQueue(blueprint);

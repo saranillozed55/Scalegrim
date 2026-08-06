@@ -59,7 +59,6 @@ public class CombatManager : GenericSingleton<CombatManager>
 
     public void EndCombat()
     {
-        Debug.Log("End Comabat Method raised");
         IsInCombat = false;
         _onEnemyEndTurn.RaiseEvent();
     }
