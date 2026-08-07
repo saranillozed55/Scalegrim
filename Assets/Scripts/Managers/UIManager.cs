@@ -31,6 +31,7 @@ public class UIManager : GenericSingleton<UIManager>
             }
             return;
         }
+
         _initialPauseMenu.RaiseEvent();
         InputManager.Instance.SwitchState(InputState.UI);
     }

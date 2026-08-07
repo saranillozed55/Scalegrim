@@ -12,9 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a161e5425554204083251726ad49ed2, type: 3}
   m_Name: DefaultCardProfile
   m_EditorClassIdentifier: Assembly-CSharp::CardAudioProfileSO
-  play: {fileID: 0}
-  hover: {fileID: 8300000, guid: 62b1cb4d9b0f35943b3546a567f56149, type: 3}
-  draw: {fileID: 0}
-  discard: {fileID: 0}
-  volume: 1
-  pitchRange: {x: 0.95, y: 1.05}
+  play:
+  - {fileID: 0}
+  hover:
+  - {fileID: 8300000, guid: 61aa65b3807e925478f7fe707c4f98fe, type: 3}
+  - {fileID: 8300000, guid: 249368a0e41a0c64481e516bf4603a6b, type: 3}
+  - {fileID: 8300000, guid: 14089202999247a4eb47cd50a8d14fcb, type: 3}
+  - {fileID: 8300000, guid: 59b697fd7772e7440bdc423908df1e13, type: 3}
+  draw:
+  - {fileID: 8300000, guid: 8c90f94807ec13e46ae57fe8a3d93eae, type: 3}
+  - {fileID: 8300000, guid: 17e775cb4bf0bcd4d853acc426c0ba4f, type: 3}
+  - {fileID: 8300000, guid: 607a60677aeeb1c4f9c09c7d7a773e37, type: 3}
+  discard:
+  - {fileID: 0}
+  volume: 0.5
+  pitchRange: {x: 0.8, y: 1.2}

@@ -76,6 +76,7 @@ public class HandManager : GenericSingleton<HandManager>
         if (_handCards.Count >= maxHandSize) return false;
         _handCards.Add(newCard);
         newCard.CardModel.SetHoverable(false);
+        SoundFXManager.Instance.Play(newCard.CardModel.cardData, CardAudioType.Draw);
 
         await UpdateCardPosition();
         return true;

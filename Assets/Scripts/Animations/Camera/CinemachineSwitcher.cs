@@ -60,11 +60,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     private void Update()
     {
-        //testing 
-        if (Keyboard.current.mKey.wasPressedThisFrame)
-        {
-            SwitchState(CameraState.PlayerHandCamera);
-        }
+
     }
 
     private void Start()

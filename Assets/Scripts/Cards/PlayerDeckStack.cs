@@ -66,7 +66,6 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
         {
             CardView poppedCard = _deckCards.Pop();
             bool drawn = await HandManager.Instance.DrawCard(poppedCard);
-
             if (!drawn)
             {
                 _deckCards.Push(poppedCard);

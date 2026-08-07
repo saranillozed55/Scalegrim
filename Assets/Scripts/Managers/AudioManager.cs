@@ -14,16 +14,16 @@ public class AudioManager : GenericSingleton<AudioManager>
         switch (type)
         {
             case CardAudioType.Play:
-                clip = profile.play;
+                clip = profile.GetRandomAudioClip(profile.play);
                 break;
             case CardAudioType.Hover:
-                clip = profile.hover;
+                clip = profile.GetRandomAudioClip(profile.hover);
                 break;
             case CardAudioType.Draw:
-                clip = profile.draw;
+                clip = profile.GetRandomAudioClip(profile.draw);
                 break;
             case CardAudioType.Discard:
-                clip = profile.discard;
+                clip = profile.GetRandomAudioClip(profile.discard);
                 break;
         }
 
@@ -34,4 +34,5 @@ public class AudioManager : GenericSingleton<AudioManager>
             Debug.Log("AudioManager played");
         }
     }
+
 }

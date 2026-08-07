@@ -3,13 +3,15 @@ using UnityEngine;
 public class TurnManager : GenericSingleton<TurnManager>
 {
     public TurnState CurrentTurnState { get; private set; }
+
     [Header("Broadcast to Event Channels")]
-    [SerializeField] private CameraStateEventChannel _onEndTurnCam;
+    [SerializeField] private CameraStateEventChannel _onEndTurnCam; // don't use this anymore
 
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
+    [SerializeField] private VoidEventChannel _onPlayerFinishedDrawCard;
 
 
     private void Start()
@@ -21,11 +23,13 @@ public class TurnManager : GenericSingleton<TurnManager>
     {
         _onPlayerEndTurn.onEventRaised += SwitchTurnState;
         _onEnemyEndTurn.onEventRaised += SwitchTurnState;
+        _onPlayerFinishedDrawCard.onEventRaised += SwitchTurnState;
     }
     private void OnDisable()
     {
         _onPlayerEndTurn.onEventRaised -= SwitchTurnState;
         _onEnemyEndTurn.onEventRaised -= SwitchTurnState;
+        _onPlayerFinishedDrawCard.onEventRaised -= SwitchTurnState;
     }
 
     private void SwitchTurnState() 
@@ -37,9 +41,8 @@ public class TurnManager : GenericSingleton<TurnManager>
         }
         else
         {
-            CurrentTurnState = TurnState.PlayerTurn;
-            _onEndTurnCam.RaiseEvent(CameraState.FPCamera);
-
+            CurrentTurnState = TurnState.PlayerMustDraw;
+            _onEndTurnCam.RaiseEvent(CameraState.PlayerDeckCamera);
         }
     }
 }

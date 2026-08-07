@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum GameState { 
     Gameplay,
-    //UI,
+    UI,
     Cutscene,
 }
 
@@ -13,10 +16,23 @@ public class GameManager : GenericSingleton<GameManager>
 
     public bool onFocus = true;
 
-    //private void Start()
-    //{
-    //    Cursor.lockState = CursorLockMode.Locked;
-    //}
+    private Dictionary<GameState, Action> gameStateActions;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        InitGameStateActions();
+    }
+
+    private void InitGameStateActions()
+    {
+        gameStateActions = new Dictionary<GameState, Action>
+        {
+            {GameState.Gameplay, OnGameStatePlay },
+            {GameState.UI, OnGameStatePaused},
+        };
+    }
+
     private void Update()
     {
         Cursor.lockState = onFocus ? CursorLockMode.Locked : CursorLockMode.None;
@@ -25,6 +41,7 @@ public class GameManager : GenericSingleton<GameManager>
     private void OnEnable()
     {
         InputManager.Instance.OnPauseButtonPressed += OnGameStatePaused;
+
     }
 
     private void OnDisable()
@@ -36,14 +53,23 @@ public class GameManager : GenericSingleton<GameManager>
     public void OnGameStatePaused()
     {
         Time.timeScale = 0;
+        Debug.Log("OnGameStatePaused");
     }
     public void OnGameStatePlay()
     {
         Time.timeScale = 1;
+        Debug.Log("OnGameStatePlay");
     }
 
-    public void SwitchGameState(GameState newState)
+    public void SwitchGameState(GameState newState) // should be using this method to switch game states instead of directly changing the CurrentGameState variable
     {
         CurrentGameState = newState;
+        
+        if(!gameStateActions.TryGetValue(newState, out Action action))
+        {
+            return;
+        }
+
+        action();
     }
 }

@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 
 public class PauseMenu : BaseUI
 {
-
     private Button _backToGameButton;
     private Button _optionsButton;
     private Button _quitButton;
@@ -72,16 +71,17 @@ public class PauseMenu : BaseUI
     }
     private void OnBackToGameButtonClicked(ClickEvent evt)
     {
-        OnClose();
         UIManager.Instance.Pop(this);
-        
-        InputManager.Instance.SwitchState(InputState.Player);
-        GameManager.Instance.OnGameStatePlay();
 
+        InputManager.Instance.SwitchState(InputState.Player);
+        GameManager.Instance.SwitchGameState(GameState.Gameplay);
         Debug.Log("Back to game button was pressed");
     }
     private void OnOptionsButtonClicked(ClickEvent evt)
     {
+        InputManager.Instance.SwitchState(InputState.UI);
+
+        GameManager.Instance.SwitchGameState(GameState.UI);
         Debug.Log("Options button was pressed");
     }
     private void OnQuitButtonClicked(ClickEvent evt)

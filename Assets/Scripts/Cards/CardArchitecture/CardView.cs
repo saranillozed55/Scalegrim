@@ -54,7 +54,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         if (card.CardPlaced || !card.CardHoverable || IsAnimating) return;
 
         _hoverTween?.Kill();
-        AudioManager.Instance.Play(card.cardData, CardAudioType.Hover);
+        SoundFXManager.Instance.Play(card.cardData, CardAudioType.Hover);
         _hoverTween = transform.DOMove(_basePosition + Vector3.up * 0.1f + Vector3.back * 0.02f, 0.2f);
     }
     public virtual void OnHoverExit()

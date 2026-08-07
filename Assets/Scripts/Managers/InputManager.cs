@@ -21,7 +21,7 @@ public class InputManager : GenericSingleton<InputManager>
     public event Action OnRightClickPressed;
     public event Action OnForwardButtonPressed;
     public event Action OnBackButtonPressed; //Called cancel in action map - this is for when we click a card but then want to go back to our hand
-    public event Action OnPauseButtonPressed;
+    public event Action OnPauseButtonPressed; 
 
     private string PlayerActionMapString = "Player";
     private string UIActionMapString = "UI";
