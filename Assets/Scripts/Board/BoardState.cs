@@ -17,8 +17,9 @@ public struct LaneSnapShot
 
 public struct CardSnapShot
 {
-    public string CardName;
-    public int Health;
-    public int Attack;
+    public CardModel cardModel;
+    //public string CardName;
+    //public int Health;
+    //public int Attack;
     //public Owner Owner;
 }

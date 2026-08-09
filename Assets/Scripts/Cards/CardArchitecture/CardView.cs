@@ -54,6 +54,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         if (card.CardPlaced || !card.CardHoverable || IsAnimating) return;
 
         _hoverTween?.Kill();
+
         SoundFXManager.Instance.Play(card.cardData, CardAudioType.Hover);
         _hoverTween = transform.DOMove(_basePosition + Vector3.up * 0.1f + Vector3.back * 0.02f, 0.2f);
     }
@@ -73,14 +74,14 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
 
     public virtual async Awaitable CardAttackAsync(CardModel attackingCard, CardModel defendingCard)
     {
-        Owner? owner = attackingCard.BoardOwner;
+        AreaOwnerType? owner = attackingCard.BoardOwner;
         try
         {
             if (owner == null) return;
 
             transform.DOKill();
 
-            Vector3 direction = owner == Owner.Player ? Vector3.forward : Vector3.back;
+            Vector3 direction = owner == AreaOwnerType.PlayerActive ? Vector3.forward : Vector3.back;
 
             await transform.DOMove(_placedPosition + direction * 0.3f, 0.15f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
 
@@ -136,6 +137,23 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         await sequence.AsyncWaitForCompletion();
 
         IsAnimating = false;
+    }
+    public async Task MoveCardToPositionWithDelay(Vector3 targetPosition, Quaternion targetRotation, float delay)
+    {
+        IsAnimating = true;
+        _moveTween?.Kill();
+        _rotateTween?.Kill();
+
+        Sequence sequence = DOTween.Sequence();
+
+        _moveTween = transform.DOMove(targetPosition, 0.3f);
+        _rotateTween = transform.DORotateQuaternion(targetRotation, 0.3f);
+
+        sequence.Join(_moveTween);
+        sequence.Join(_rotateTween);
+        sequence.SetDelay(delay);
+
+        await sequence.AsyncWaitForCompletion();
     }
 
     public async Task RotateCard(Quaternion targetRotation)

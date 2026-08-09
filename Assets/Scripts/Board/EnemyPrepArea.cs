@@ -2,6 +2,7 @@ using DG.Tweening;
 using System;
 using UnityEngine;
 
+//Don't use this anymore
 public class EnemyPrepArea : MonoBehaviour, ICardDropArea
 {
     [SerializeField] private CardDropArea _frontCardDropArea;

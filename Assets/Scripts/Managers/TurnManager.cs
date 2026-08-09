@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TurnManager : GenericSingleton<TurnManager>
@@ -5,14 +7,23 @@ public class TurnManager : GenericSingleton<TurnManager>
     public TurnState CurrentTurnState { get; private set; }
 
     [Header("Broadcast to Event Channels")]
-    [SerializeField] private CameraStateEventChannel _onEndTurnCam; // don't use this anymore
-
+    [SerializeField] private VoidEventChannel _onPlayerStartTurn;
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
-    [SerializeField] private VoidEventChannel _onPlayerFinishedDrawCard;
 
+    private Dictionary<TurnState, Action> turnStates;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        turnStates = new Dictionary<TurnState, Action>
+        {
+            {TurnState.PlayerTurn, PlayerTurn },
+            {TurnState.EnemyTurn, EnemyTurn },
+        };
+    }
 
     private void Start()
     {
@@ -23,26 +34,52 @@ public class TurnManager : GenericSingleton<TurnManager>
     {
         _onPlayerEndTurn.onEventRaised += SwitchTurnState;
         _onEnemyEndTurn.onEventRaised += SwitchTurnState;
-        _onPlayerFinishedDrawCard.onEventRaised += SwitchTurnState;
     }
+
     private void OnDisable()
     {
         _onPlayerEndTurn.onEventRaised -= SwitchTurnState;
         _onEnemyEndTurn.onEventRaised -= SwitchTurnState;
-        _onPlayerFinishedDrawCard.onEventRaised -= SwitchTurnState;
+    }
+
+    private void PlayerTurn()
+    {
+        CinemachineSwitcher.Instance.SwitchState(CameraState.PlayerDeckCamera);
+        //await probably in handmanager so we can wait until we have drawn card
+        //this should be the only one sending out events
+        Debug.Log("PlayerTurn");
+
+    }
+
+    private void EnemyTurn()
+    {
+        CinemachineSwitcher.Instance.SwitchState(CameraState.BoardCamera);
+
+        _onPlayerStartTurn.RaiseEvent();
+        Debug.Log("EnemyTurn");
     }
 
     private void SwitchTurnState() 
     {
         if(CurrentTurnState == TurnState.PlayerTurn)
         {
-            CurrentTurnState = TurnState.EnemyTurn;
-            _onEndTurnCam.RaiseEvent(CameraState.BoardCamera);
+            SwitchTurnState(TurnState.EnemyTurn);
         }
         else
         {
-            CurrentTurnState = TurnState.PlayerMustDraw;
-            _onEndTurnCam.RaiseEvent(CameraState.PlayerDeckCamera);
+            SwitchTurnState(TurnState.PlayerTurn);
         }
+    }
+
+    public void SwitchTurnState(TurnState newState)
+    {
+        CurrentTurnState = newState;
+
+        if(!turnStates.TryGetValue(newState, out Action action))
+        {
+            return;
+        }
+
+        action();
     }
 }

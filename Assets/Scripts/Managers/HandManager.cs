@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Unity.Cinemachine;
 using Unity.VectorGraphics;
@@ -30,6 +31,9 @@ public class HandManager : GenericSingleton<HandManager>
 
     private CardView _currentHoveredCard;
     private List<CardView> _handCards = new();
+
+    //NOT SURE IF WE WANT THE LOGIC FOR WAITING TO DRAW CARD TO BE IN HERE YET
+    [SerializeField] private VoidEventChannel _onPlayerStartTurn;
 
     protected override void Awake()
     {
@@ -70,7 +74,8 @@ public class HandManager : GenericSingleton<HandManager>
         CurrentHandState = HandState.InHand; // change
         InputManager.Instance.OnBackButtonPressed += SelectionManager.Instance.DeselectCard;
     }
-    public async Task<bool> DrawCard(CardView newCard)
+
+    public bool DrawCard(CardView newCard)
     {
         if (newCard == null) return false;
         if (_handCards.Count >= maxHandSize) return false;
@@ -78,7 +83,8 @@ public class HandManager : GenericSingleton<HandManager>
         newCard.CardModel.SetHoverable(false);
         SoundFXManager.Instance.Play(newCard.CardModel.cardData, CardAudioType.Draw);
 
-        await UpdateCardPosition();
+        _ = UpdateCardPosition();
+
         return true;
     }
 
@@ -179,7 +185,7 @@ public class HandManager : GenericSingleton<HandManager>
 
     public async Task PlayCurrentCard(CardDropArea targetArea)
     {
-        if (targetArea.SlotOwner != Owner.Player) return;
+        if (targetArea.SlotOwner != AreaOwnerType.PlayerActive) return;
 
         CardView playedCard = SelectionManager.Instance.SelectedHandCard;
         SelectionManager.Instance.CardPlayedDeselect();

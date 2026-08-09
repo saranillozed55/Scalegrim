@@ -257,7 +257,7 @@ Transform:
   m_GameObject: {fileID: 56365807}
   serializedVersion: 2
   m_LocalRotation: {x: 0.32167506, y: 0.3059732, z: -0.114454806, w: 0.88871014}
-  m_LocalPosition: {x: 0.766, y: 1.898, z: -3.557}
+  m_LocalPosition: {x: 0.591, y: 1.9, z: -3.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1203,10 +1203,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 726e393082aba7a488979915d1a14876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CinemachineSwitcher
-  _cardSelectedCam: {fileID: 11400000, guid: 75c524556d7774b4981d62b477955774, type: 2}
-  _cardUnselectedCam: {fileID: 11400000, guid: e2517d71858c06743b2a7c9d58a93ea2, type: 2}
-  _onEndTurn: {fileID: 11400000, guid: f5436d02217d4454ab5967d10241ed14, type: 2}
-  _onCombatEnd: {fileID: 11400000, guid: f5436d02217d4454ab5967d10241ed14, type: 2}
   _cameras:
   - {fileID: 849692302}
   - {fileID: 415385662}
@@ -1456,7 +1452,7 @@ MonoBehaviour:
     DefaultMode: 2
   DefaultBlend:
     Style: 2
-    Time: 0.25
+    Time: 0.4
     CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -2427,6 +2423,7 @@ MonoBehaviour:
   _viewToUsePoint: {fileID: 0}
   _handPosition: {fileID: 66736066}
   _fpCamera: {fileID: 849692302}
+  _onPlayerStartTurn: {fileID: 0}
 --- !u!4 &837550915
 Transform:
   m_ObjectHideFlags: 0
@@ -2609,6 +2606,7 @@ GameObject:
   m_Component:
   - component: {fileID: 872892235}
   - component: {fileID: 872892236}
+  - component: {fileID: 872892237}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2653,6 +2651,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 54f87235694603a409227a23ae575626, type: 2}
   - {fileID: 11400000, guid: 27e0292710b657e42be4433035b55cef, type: 2}
   - {fileID: 11400000, guid: dc61c970556bec643a48cdd68ea82264, type: 2}
+--- !u!114 &872892237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 872892234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84cc7727c9432aa428a70fbf0e5ab769, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
 --- !u!1 &927112455
 GameObject:
   m_ObjectHideFlags: 0
@@ -3328,7 +3338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0304a82f98a10440be9cc15e4bf5242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EndTurn
-  _onEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
+  _onPlayerEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
   _onEndTurnSpeed: 0.5
 --- !u!1 &1196077339
 GameObject:
@@ -4080,7 +4090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a395e480ff1874140837846d21ab7554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
-  _onEndTurnCam: {fileID: 11400000, guid: f5436d02217d4454ab5967d10241ed14, type: 2}
+  _onPlayerStartTurn: {fileID: 11400000, guid: e66634b6ecc462c46957f1d4dbb47b04, type: 2}
   _onPlayerEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
   _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   _onPlayerFinishedDrawCard: {fileID: 11400000, guid: e66634b6ecc462c46957f1d4dbb47b04, type: 2}
@@ -5182,6 +5192,7 @@ MonoBehaviour:
   _gapSize: 0.01
   _spawnLocation: {fileID: 69232226}
   _playerDeck: {fileID: 872892236}
+  _onPlayerStartTurn: {fileID: 11400000, guid: e66634b6ecc462c46957f1d4dbb47b04, type: 2}
 --- !u!65 &1898344740
 BoxCollider:
   m_ObjectHideFlags: 0

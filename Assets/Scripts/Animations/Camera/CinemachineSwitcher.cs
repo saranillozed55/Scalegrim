@@ -15,12 +15,6 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 {
     private CameraState _currentCameraState;
 
-    [Header("Listener to Event Channels")]
-    [SerializeField] private CameraStateEventChannel _cardSelectedCam;
-    [SerializeField] private CameraStateEventChannel _cardUnselectedCam;
-    [SerializeField] private CameraStateEventChannel _onEndTurn;
-    [SerializeField] private CameraStateEventChannel _onCombatEnd;
-
     [Header("References")]
     [Space]
     [SerializeField] private CinemachineCamera[] _cameras;
@@ -35,25 +29,15 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     private CinemachineCamera _currentCamera;
 
-    private Quaternion _fpCameraBaseRotation;
 
     private void OnEnable()
     {
-
-        _cardSelectedCam.onEventRaised += SwitchState;
-        _cardUnselectedCam.onEventRaised += SwitchState;
-        _onEndTurn.onEventRaised += SwitchState;
-
         InputManager.Instance.OnBackButtonPressed += HandleBackButton;
         InputManager.Instance.OnForwardButtonPressed += HandleForwardButton;
 
     }
     private void OnDisable()
     {
-        _cardSelectedCam.onEventRaised -= SwitchState;
-        _cardUnselectedCam.onEventRaised -= SwitchState;
-        _onEndTurn.onEventRaised -= SwitchState;
-
         InputManager.Instance.OnBackButtonPressed -= HandleBackButton;
         InputManager.Instance.OnForwardButtonPressed -= HandleForwardButton;
     }
@@ -66,8 +50,6 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
     private void Start()
     {
         InitCameras();
-
-        _fpCameraBaseRotation = _firstPersonCamera.transform.rotation;
     }
 
     private void InitCameras()
@@ -106,7 +88,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
         }
     }
 
-    private void SwitchState(CameraState newState)
+    public void SwitchState(CameraState newState)
     {
         if (!_cameraMap.TryGetValue(newState, out CinemachineCamera targetCamera))
         {

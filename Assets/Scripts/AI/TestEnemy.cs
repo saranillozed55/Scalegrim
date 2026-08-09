@@ -39,7 +39,6 @@ public class TestEnemy : MonoBehaviour
         //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
         _onEnemyEndTurn.onEventRaised += OnEnemyEndTurnHandler;
     }
-
     private void OnDisable()
     {
         //_onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
@@ -157,7 +156,6 @@ public class TestEnemy : MonoBehaviour
 
                 wasPlaced = await cardPlacer.HandlePlaceCard(model, lane); // REMOVE _enemyDeck from this method
             }
-
 
 
             if(wasPlaced)

@@ -19,15 +19,15 @@ public class CardModel
         );
 
 
-    public Owner? BoardOwner
+    public AreaOwnerType? BoardOwner
     {
         get
         {
             var lane = Lane;
             if (lane == null) return null;
-            if (lane.PlayerActiveCard == this) return Owner.Player;
-            if (lane.EnemyActiveCard == this) return Owner.Enemy;
-            if (lane.EnemyActiveCard == this) return Owner.Enemy;
+            if (lane.PlayerActiveCard == this) return AreaOwnerType.PlayerActive;
+            if (lane.EnemyActiveCard == this) return AreaOwnerType.EnemyActive;
+            if (lane.EnemyActiveCard == this) return AreaOwnerType.EnemyActive;
             return null;
         }
     }

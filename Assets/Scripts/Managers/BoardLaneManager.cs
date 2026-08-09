@@ -11,6 +11,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
+    [SerializeField] private List<CardDropArea> activeCardDropAreas;
 
     [Header("Broadcast to EventChannels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
@@ -18,11 +19,10 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     [Header("Listener to EventChannels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
 
-    [Header("Test card prefab")]
-    [SerializeField] private CardView _cardViewPrefab;
-
     private List<Lane> logicLanes = new List<Lane>();
     public List<Lane> LogicLanes => logicLanes;
+
+    private LaneBuilder laneBuilder = new LaneBuilder();
 
     protected override void Awake()
     {
@@ -34,6 +34,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     {
         _onPlayerEndTurn.onEventRaised += AdvanceEnemyCardsFromQueue;
     }
+
     private void OnDisable()
     {
         _onPlayerEndTurn.onEventRaised -= AdvanceEnemyCardsFromQueue;
@@ -44,16 +45,27 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         logicLanes.Clear();
         foreach (LaneView view in physicalLanes)
         {
+            List<CardDropArea> activeAreas = view.activeAreas;
+
+            foreach(CardDropArea area in activeAreas)
+            {
+                laneBuilder.CreateLane(area);
+            }
 
             Lane dataLane = new Lane { LaneIndex = view.laneIndex };
             logicLanes.Add(dataLane);
         }
     }
 
-    public void PlaceCardInLane(CardModel card, int laneIndex, Owner slotOwner)
+    private void LoadBoard()
+    {
+        
+    }
+
+    public void PlaceCardInLane(CardModel card, int laneIndex, AreaOwnerType slotOwner)
     {
         Lane updatedLane = logicLanes[laneIndex];
-        if (slotOwner == Owner.Enemy)
+        if (slotOwner == AreaOwnerType.EnemyActive)
         {
             updatedLane.EnemyActiveCard = card;
         }
@@ -84,7 +96,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         }
         EnemyPrepArea targetPrepArea = _prepAreas[laneIndex];
 
-        if (!targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsFull())
+        if (!targetPrepArea.HasCard && targetPrepArea.FrontCardDropArea.IsAreaTaken())
         {
             return false;
         }
@@ -108,7 +120,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         List<Awaitable> animationTasks = new List<Awaitable>();
         foreach (LaneView lane in physicalLanes)
         {
-            if (lane.EnemyPrepArea.HasCard && lane.EnemyActiveArea.IsFull())
+            if (lane.EnemyPrepArea.HasCard && lane.EnemyActiveArea.IsAreaTaken())
             {
                 Debug.Log("There is already a card infront of this lane, cannot advance queued card");
                 continue;
@@ -191,9 +203,10 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 
         return new CardSnapShot
         {
-            CardName = card.Name,
-            Attack = card.AttackDamage,
-            Health = card.Health,
+            cardModel = card,
+            //CardName = card.Name,
+            //Attack = card.AttackDamage,
+            //Health = card.Health,
         };
     }
 
@@ -208,7 +221,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
                 availableLanes.Add(i);
             }
         }
-        return availableLanes; ;
+        return availableLanes;
     }
 
     public void RemoveCardFromLane(CardModel deadCard)

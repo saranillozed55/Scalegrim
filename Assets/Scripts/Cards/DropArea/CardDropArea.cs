@@ -1,21 +1,32 @@
 using DG.Tweening;
 using UnityEngine;
-public enum Owner {
-    Player,
-    Enemy,
+public enum AreaOwnerType {
+    PlayerActive,
+    EnemyActive,
+    EnemyQueue,
 }
 
-public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
+public partial class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
 {
-    [field: SerializeField] public Owner SlotOwner { get; private set; } // this is set in the insepctor
+    private CardDropAreaData cardDropAreaData;
+
+    [field: SerializeField] public AreaOwnerType SlotOwner { get; private set; } // this is set in the insepctor
 
     [Range(0,3)]
     [SerializeField] private int laneIndex; // Define 0 through 3 inside the unity inspector
 
-
-    public bool IsFull()
+    public void Init(CardDropAreaData data)
     {
-        if(SlotOwner == Owner.Player)
+        cardDropAreaData = data;
+
+        UpdateEnvironmentVisuals();
+    }
+
+    public bool IsAreaTaken()
+    {
+        //return cardDropAreaData.IsTaken;
+
+        if(SlotOwner == AreaOwnerType.PlayerActive)
         {
             return BoardLaneManager.Instance.LogicLanes[laneIndex].IsPlayerSideOccupied;
         }
@@ -23,6 +34,11 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
         {
             return BoardLaneManager.Instance.LogicLanes[laneIndex].IsEnemySideOccupied;
         }
+    }
+
+    private void UpdateEnvironmentVisuals()
+    {
+
     }
 
     public void OnCardDrop(CardView playedCard)
@@ -41,12 +57,12 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
 
     public void LoadCardAreas()
     {
-
+         
     }
 
     public void OnClick()
     {
-        if (SelectionManager.Instance.SelectedHandCard != null && !IsFull() && SlotOwner == Owner.Player)
+        if (SelectionManager.Instance.SelectedHandCard != null && !IsAreaTaken() && SlotOwner == AreaOwnerType.PlayerActive)
         {
            _ = HandManager.Instance.PlayCurrentCard(this);
         }
@@ -64,4 +80,5 @@ public class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
     {
 
     }
+
 }
