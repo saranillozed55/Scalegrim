@@ -1,0 +1,19 @@
+:root {
+}
+
+.slider {
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-size: 32px;
+    -unity-font-definition: url("project://database/Assets/Fonts/edo/edo.ttf?fileID=12800000&guid=6731d5cd2ac1bab4eb8b39fb056c197e&type=3#edo");
+    background-color: rgba(0, 0, 0, 0);
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}
+
+.slider:hover {
+    transition-duration: 0.25s;
+}

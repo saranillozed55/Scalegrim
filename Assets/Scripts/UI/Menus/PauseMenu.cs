@@ -34,15 +34,6 @@ public class PauseMenu : BaseUI
         _initialPauseMenu.onEventRaised -= PushToStack;
     }
 
-    private void Update()
-    {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            //OnOpen();
-        }
-    }
-
-
     public override void OnOpen()
     {
         base.OnOpen();
@@ -80,10 +71,13 @@ public class PauseMenu : BaseUI
     private void OnOptionsButtonClicked(ClickEvent evt)
     {
         InputManager.Instance.SwitchState(InputState.UI);
-
         GameManager.Instance.SwitchGameState(GameState.UI);
+
+        UI.Events.UIEventBus.RaiseOnOptionsButtonClicked();
+
         Debug.Log("Options button was pressed");
     }
+
     private void OnQuitButtonClicked(ClickEvent evt)
     {
         // Logs the exit attempt in the console

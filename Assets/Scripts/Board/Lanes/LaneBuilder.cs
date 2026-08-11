@@ -5,11 +5,8 @@ using UnityEngine;
 public class LaneBuilder
 {
     
-    //Want to load lane 1 -> lane 2 -> etc
     public void CreateLane(CardDropArea area)
     {
-        
-        // build CardDropAreas here
-        
+        //Animations here idk                
     }
 }

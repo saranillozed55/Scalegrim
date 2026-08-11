@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public static readonly float CurrentPlayerHealth = 15f; // this should be moved to data
+    public static readonly float CurrentPlayerHealth = 15f; // this should be moved to data and also shouldn't be readonly
     private PlayerData playerData;
 
 

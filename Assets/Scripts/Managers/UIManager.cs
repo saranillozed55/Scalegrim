@@ -57,6 +57,8 @@ public class UIManager : GenericSingleton<UIManager>
             return;
         }
         _uiStack.Pop().OnClose();
+
+        if (_uiStack.Count > 0) _uiStack.Peek().OnFocus();
     }
     public void PopAll()
     {

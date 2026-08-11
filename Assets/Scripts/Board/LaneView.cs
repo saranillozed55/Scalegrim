@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class LaneView : MonoBehaviour
 {
-
     [Header("Lane Index")]
     public int laneIndex;
 
@@ -11,12 +10,16 @@ public class LaneView : MonoBehaviour
     [SerializeField] private EnemyPrepArea enemyPrepArea; // Queue slot
     [SerializeField] private CardDropArea enemyActiveArea; // Front slot
     [SerializeField] private CardDropArea playerActiveArea; // Player slot
-    public List<CardDropArea> activeAreas = new();
 
-    private void Awake()
+    private Lane laneData;
+
+    public void Init(Lane lane)
     {
-        activeAreas = new List<CardDropArea> { enemyActiveArea, playerActiveArea };
-    }
+        laneData = lane;
+
+        playerActiveArea.Init(laneData.PlayerArea);
+        enemyActiveArea.Init(laneData.EnemyArea);
+    }    
 
     public EnemyPrepArea EnemyPrepArea => enemyPrepArea;
     public CardDropArea EnemyActiveArea => enemyActiveArea;

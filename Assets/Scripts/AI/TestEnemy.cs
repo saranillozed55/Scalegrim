@@ -17,13 +17,10 @@ public class TestEnemy : MonoBehaviour
     [Header("Broadcast to Event Channels")]
     [SerializeField] private VoidEventChannel _onSurrenderPerformed;
 
-    [Header("Settings for Next Card Moves")]
-    [SerializeField] private float DAMAGE_THRESHOLD = 5f;
-
     [Header("AI profile")]
     [SerializeField] private AIPersonality _aiProfile;
 
-    BoardEvaluater eval = new BoardEvaluater();
+    //BoardEvaluater eval = new BoardEvaluater();
     CardPlacer cardPlacer = new CardPlacer();
     EnemyTurnQueue enemyTurnQueue = new EnemyTurnQueue();
     CardRetriever cardRetriever;

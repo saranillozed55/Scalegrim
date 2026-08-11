@@ -52,9 +52,9 @@ AudioMixerController:
   - guid: 6742ecba991ab484a88c477452f164c6
     name: masterVolume
   - guid: c03dd387d0b694a48b68fa42acf4c415
-    name: sfxVolume
-  - guid: ddc94fde83339d341b071f113037ff98
     name: musicVolume
+  - guid: ddc94fde83339d341b071f113037ff98
+    name: sfxVolume
   m_AudioMixerGroupViews:
   - guids:
     - 8474ef7949956544e9b12b6945138ac5
@@ -108,8 +108,8 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: a46a2dc826e030b42957b51b45928e9c
   m_FloatValues:
-    c03dd387d0b694a48b68fa42acf4c415: -3.509042
-    ddc94fde83339d341b071f113037ff98: -24.900742
+    c03dd387d0b694a48b68fa42acf4c415: -0.27209988
+    ddc94fde83339d341b071f113037ff98: -0.28339827
   m_TransitionOverrides: {}
 --- !u!243 &5053273297150008715
 AudioMixerGroupController:

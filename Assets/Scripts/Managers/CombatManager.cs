@@ -10,11 +10,19 @@ public class CombatManager : GenericSingleton<CombatManager>
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
 
+    private EncounterData _encounterData;
+
+    public int TurnsPassed { get; private set; }
+
     public bool IsInCombat { get; private set; }
 
     private void Start()
     {
         IsInCombat = false;
+
+        /* Move these into LoadCombat Or something once we have UI stuff*/
+        _encounterData = new EncounterData();
+        BoardLaneManager.Instance.InitializeBoard(_encounterData);
     }
 
     private void OnEnable()
@@ -59,6 +67,7 @@ public class CombatManager : GenericSingleton<CombatManager>
 
     public void EndCombat()
     {
+        TurnsPassed++;
         IsInCombat = false;
         _onEnemyEndTurn.RaiseEvent();
     }

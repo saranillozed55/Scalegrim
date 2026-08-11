@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum LaneEnvironment 
+public enum EnvironmentType 
 {
     None,
     Land,

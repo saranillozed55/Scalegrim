@@ -21,19 +21,18 @@ public class HandManager : GenericSingleton<HandManager>
     [SerializeField] private CardView cardViewPrefab; // change this to specific card prefabs
     [SerializeField] private float cardOverlap = 0.15f;
 
+    /* Move these references to player instead I believe*/
     [Header("References")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Transform _viewToUsePoint;
     [SerializeField] private Transform _handPosition;
+
     [SerializeField] private CinemachineCamera _fpCamera;
 
     private MousePosition _mousePosition;
 
     private CardView _currentHoveredCard;
     private List<CardView> _handCards = new();
-
-    //NOT SURE IF WE WANT THE LOGIC FOR WAITING TO DRAW CARD TO BE IN HERE YET
-    [SerializeField] private VoidEventChannel _onPlayerStartTurn;
 
     protected override void Awake()
     {

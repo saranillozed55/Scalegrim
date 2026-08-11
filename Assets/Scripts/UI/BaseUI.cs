@@ -32,10 +32,12 @@ public class BaseUI : MonoBehaviour, IUIToolkit
     }
     public virtual void OnFocus()
     {
+        Container.RemoveFromClassList("hidden");
         //implement
     }
     public virtual void OnLoseFocus()
     {
+        Container.AddToClassList("hidden");
         //implement
     }
 

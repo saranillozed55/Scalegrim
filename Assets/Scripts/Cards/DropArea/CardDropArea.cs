@@ -9,7 +9,6 @@ public enum AreaOwnerType {
 public partial class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IHoverable
 {
     private CardDropAreaData cardDropAreaData;
-
     [field: SerializeField] public AreaOwnerType SlotOwner { get; private set; } // this is set in the insepctor
 
     [Range(0,3)]
@@ -19,7 +18,11 @@ public partial class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IH
     {
         cardDropAreaData = data;
 
-        UpdateEnvironmentVisuals();
+        //subscribe to event here
+
+        Debug.Log($"Environment: {data.Environment}, SlotOwner: {SlotOwner} ");
+
+        UpdateEnvironmentVisuals(cardDropAreaData.Environment);
     }
 
     public bool IsAreaTaken()
@@ -36,7 +39,11 @@ public partial class CardDropArea : MonoBehaviour, ICardDropArea, IClickable, IH
         }
     }
 
-    private void UpdateEnvironmentVisuals()
+    private void HandleEnvironmentChanged()
+    {
+        
+    }
+    private void UpdateEnvironmentVisuals(EnvironmentType environment)
     {
 
     }

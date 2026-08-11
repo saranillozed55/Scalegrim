@@ -11,7 +11,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
 {
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
-    [SerializeField] private List<CardDropArea> activeCardDropAreas;
 
     [Header("Broadcast to EventChannels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
@@ -20,14 +19,14 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
 
     private List<Lane> logicLanes = new List<Lane>();
-    public List<Lane> LogicLanes => logicLanes;
 
-    private LaneBuilder laneBuilder = new LaneBuilder();
+    public IReadOnlyList<Lane> LogicLanes => logicLanes;
+
+    private LaneBuilder laneBuilder = new LaneBuilder(); // not sure when to use this yet
 
     protected override void Awake()
     {
         base.Awake();
-        InitializeBoard();
     }
 
     private void OnEnable()
@@ -40,20 +39,15 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
         _onPlayerEndTurn.onEventRaised -= AdvanceEnemyCardsFromQueue;
     }
 
-    private void InitializeBoard()
+    public void InitializeBoard(EncounterData encounterData)
     {
         logicLanes.Clear();
+
         foreach (LaneView view in physicalLanes)
         {
-            List<CardDropArea> activeAreas = view.activeAreas;
-
-            foreach(CardDropArea area in activeAreas)
-            {
-                laneBuilder.CreateLane(area);
-            }
-
-            Lane dataLane = new Lane { LaneIndex = view.laneIndex };
-            logicLanes.Add(dataLane);
+            Lane laneData = encounterData.GetLane(view.laneIndex);
+            view.Init(laneData);
+            logicLanes.Add(laneData);
         }
     }
 
