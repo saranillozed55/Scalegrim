@@ -3531,6 +3531,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatManager
   _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   _onCombatStart: {fileID: 11400000, guid: 915cc0dac3f10634298ecb97b458aa6e, type: 2}
+  player: {fileID: 872892237}
 --- !u!4 &1344698769
 Transform:
   m_ObjectHideFlags: 0

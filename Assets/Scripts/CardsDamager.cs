@@ -1,36 +1,22 @@
 using UnityEditor;
 using UnityEngine;
+using Cards.Events;
 
+//this will be used for calculations as well once game gets bigger
 public static class CardsDamager
 {
     public static void ApplyDamage(CardModel attackingCard, CardModel defendingCard)
     {
+        int damage = attackingCard.AttackDamage;
         if (defendingCard == null)
         {
             Debug.Log("This should damage enemy/person");
-            return;
+            CardEventBus.RaiseOnDirectDamage(damage);
+            //CombatManager.Instance.PlayerTakeDamage(damage);
         }
         else
         {
-            defendingCard.Health -= attackingCard.AttackDamage;
-            CheckCardDeath(defendingCard);
-
-            Debug.Log($"Damage done to target card {attackingCard.AttackDamage}, Opposite Card Health after Damage: {defendingCard.Health}");
-        }
-    }
-
-    private static void CheckCardDeath(CardModel defendingCard)
-    {
-        if(defendingCard.CardPlaced && defendingCard.Health <= 0 && !defendingCard.Dead)
-        {
-            defendingCard.Dead = true;
-
-            CardView view = CardView.GetView(defendingCard);
-            if(view != null)
-            {
-                GameObject.Destroy(view.gameObject);   
-            }
-            BoardLaneManager.Instance.RemoveCardFromLane(defendingCard);
+            defendingCard.TakeDamage(damage);
         }
     }
 }

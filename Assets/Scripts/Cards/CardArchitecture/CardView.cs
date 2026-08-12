@@ -35,7 +35,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     private Tween _moveTween;
     private Tween _rotateTween;
     private Tween _hoverTween;
-    
+
     public bool IsAnimating { get; private set; }
     public Quaternion BaseRotation { get; private set; }
 
@@ -62,7 +62,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     {
         if (card.CardPlaced || !card.CardHoverable || IsAnimating) return;
         _hoverTween?.Kill();
-        
+
         _hoverTween = transform.DOMove(_basePosition, 0.2f);
     }
     public virtual void OnClick()
@@ -93,7 +93,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         }
         catch (Exception ex)
         {
-            Debug.LogWarning("Card action stopped because the card was removed: " + ex.Message);
+            Debug.LogException(ex);
             transform.DOKill();
         }
     }
@@ -105,7 +105,7 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
     {
         //Debug.Log("Card was deselected");
     }
-    
+
     public async Task MoveCardToPosition(Vector3 targetPosition)
     {
         IsAnimating = true;
@@ -168,4 +168,14 @@ public class CardView : MonoBehaviour, IClickable, IHoverable
         IsAnimating = false;
     }
 
+    public void CardDeath()
+    {
+        //then should have animation as well
+        GameObject.Destroy(this.gameObject);
+    }
+    public void CardTakeDamage()
+    {
+
+    }
 }
+

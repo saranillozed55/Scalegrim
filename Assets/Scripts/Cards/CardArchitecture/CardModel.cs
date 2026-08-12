@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
-public class CardModel
+public class CardModel : IDamageable
 {
     public readonly CardDataSO cardData;
 
@@ -32,9 +33,6 @@ public class CardModel
         }
     }
 
-    public bool IsOnBoard => Lane != null;
-    public bool IsQueued => Lane?.EnemyQueuedCard == this;
-
     public CardModel(CardDataSO cardData)
     {
         this.cardData = cardData;
@@ -44,7 +42,6 @@ public class CardModel
         ViewPrefab = cardData.ViewPrefab;
     }
 
-    public string Name { get => cardData.Name; }
     public CardView ViewPrefab
     {
         get
@@ -56,6 +53,9 @@ public class CardModel
 
         }
     }
+    public bool IsOnBoard => Lane != null;
+    public bool IsQueued => Lane?.EnemyQueuedCard == this;
+    public string Name { get => cardData.Name; }
 
     public int Cost { get; set; }
     public int Health { get; set; }
@@ -67,6 +67,30 @@ public class CardModel
     {
         if (!CardPlaced)
             CardPlaced = true;
+    }
+
+    public void TakeDamage(int val)
+    {
+        Health -= val;
+        if (Health < 0 && !Dead)
+        {
+            Dead = true;
+
+            BoardLaneManager.Instance.RemoveCardFromLane(this);
+            CardView view = CardView.GetView(this);
+            if(view != null)
+            {
+                view.CardDeath();
+            }
+        }
+        else
+        {
+            CardView view = CardView.GetView(this);
+            if(view != null)
+            {
+                view.CardTakeDamage();
+            }
+        }
     }
 
     public void CardAttack(CardModel attackingCard, CardModel defendingCard)

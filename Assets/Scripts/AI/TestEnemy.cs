@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class TestEnemy : MonoBehaviour
+public class TestEnemy : MonoBehaviour, IDamageable
 {
     [Header("Blueprint list")]
     [SerializeField] private List<Blueprint> _bluePrints; // each enemy should have a list of blueprints, but for testing purposes we will have a list of blueprints in this script
@@ -165,6 +165,10 @@ public class TestEnemy : MonoBehaviour
 
         }
         return true;
+    }
+    public void TakeDamage(int val)
+    {
+
     }
 
     //private void QueueNextCardInLane()

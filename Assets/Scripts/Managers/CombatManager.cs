@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
-
+using MainPlayer;
 public class CombatManager : GenericSingleton<CombatManager>
 {
     [Header("Broadcast to Event Channels")]
@@ -15,6 +15,19 @@ public class CombatManager : GenericSingleton<CombatManager>
     public int TurnsPassed { get; private set; }
 
     public bool IsInCombat { get; private set; }
+
+    [SerializeField] private Player player;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        player = FindFirstObjectByType<Player>();
+    }
+
+    public void Init(Player player) 
+    {
+        this.player = player;
+    }
 
     private void Start()
     {
