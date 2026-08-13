@@ -6,16 +6,19 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerDeckStack : MonoBehaviour, IClickable
+//in obsidian, said that maybe not use ICardSpawner and instead use a script to spawn in cards rather than multiple scripts trying to spawn in cards
+public class PlayerDeckStack : MonoBehaviour, IClickable, ICardSpawner
 {
-    private Transform _playerDeckStackPosition;
+    public Transform spawnerTransform { get; set; }
+    [SerializeField] private Transform refSpawnerTransform;
     private bool _stackLoaded = false;
-
+    private Transform _playerDeckStackPosition;
     [SerializeField] private float _gapSize = 0.02f;
     [SerializeField] private Transform _spawnLocation;
     [SerializeField] private PlayerDeck _playerDeck;
 
     private Stack<CardView> _deckCards = new();
+    private CardSpawner spawner; 
 
     private bool canDrawCards = false;
     private bool _isPopping = false;
@@ -23,6 +26,11 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onPlayerStartTurn;
+
+    private void Awake()
+    {
+        spawnerTransform = refSpawnerTransform;
+    }
 
     private void OnEnable()
     {
@@ -36,6 +44,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
     private void Start()
     {
+        spawner = new CardSpawner();
         _playerDeckStackPosition = GetComponent<Transform>();
         canDrawCards = true;
 
@@ -72,7 +81,8 @@ public class PlayerDeckStack : MonoBehaviour, IClickable
 
         for (int i = 0; i < deckCards.Count; i++)
         {
-            CardView instance = Instantiate(deckCards[i].ViewPrefab, _spawnLocation.position, _spawnLocation.rotation);
+            //CardView instance = Instantiate(deckCards[i].ViewPrefab, _spawnLocation.position, _spawnLocation.rotation, spawnerTransform);
+            CardView instance = spawner.SpawnDesignatedCard(deckCards[i].ViewPrefab, _spawnLocation.transform, spawnerTransform);
             instance.InitCard(deckCards[i]);
 
             float delay = i * 0.08f;

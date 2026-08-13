@@ -1,3 +1,4 @@
+using Cards.Events;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,17 +29,18 @@ public class TestEnemy : MonoBehaviour, IDamageable
     [Header("Testing references")]
     [SerializeField] private BlueprintRetriever blueprintRetriever;
     [SerializeField] private CardGroupRetriever cardGroupRetriever;
-
-    private int turnsPassed = 0;
+    [SerializeField] private int Health = 15;
 
     private void OnEnable()
     {
         //_onEnemyEndTurn.onEventRaised += QueueNextCardInLane;
+        CardEventBus.OnDirectEnemyDamage += TakeDamage;
         _onEnemyEndTurn.onEventRaised += OnEnemyEndTurnHandler;
     }
     private void OnDisable()
     {
         //_onEnemyEndTurn.onEventRaised -= QueueNextCardInLane;
+        CardEventBus.OnDirectEnemyDamage -= TakeDamage;
         _onEnemyEndTurn.onEventRaised -= OnEnemyEndTurnHandler;
     }
 
@@ -160,15 +162,13 @@ public class TestEnemy : MonoBehaviour, IDamageable
                 availableLanes.RemoveAt(randomIndex); // remove the lane from available lanes if the card was placed successfully
                 Debug.Log($"Card was sucessfully placed in lane {lane + 1}");
             }
-
-            turnsPassed++;
-
         }
         return true;
     }
     public void TakeDamage(int val)
     {
-
+        Health -= val;
+        Debug.Log($"TestEnemy Health: {Health}");
     }
 
     //private void QueueNextCardInLane()

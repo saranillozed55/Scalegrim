@@ -7,8 +7,10 @@ using UnityEngine.Analytics;
 using System;
 using System.Threading.Tasks;
 
-public class BoardLaneManager : GenericSingleton<BoardLaneManager>
+public class BoardLaneManager : GenericSingleton<BoardLaneManager>, ICardSpawner
 {
+    public Transform spawnerTransform { get; set; }
+    [SerializeField] private Transform refSpawnerTransform;
     [SerializeField] private List<EnemyPrepArea> _prepAreas;
     [SerializeField] private List<LaneView> physicalLanes;
 
@@ -23,10 +25,17 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
     public IReadOnlyList<Lane> LogicLanes => logicLanes;
 
     private LaneBuilder laneBuilder = new LaneBuilder(); // not sure when to use this yet
+    private CardSpawner spawner;
 
     protected override void Awake()
     {
         base.Awake();
+        spawnerTransform = refSpawnerTransform;
+    }
+
+    private void Start()
+    {
+        spawner = new CardSpawner();
     }
 
     private void OnEnable()
@@ -95,8 +104,8 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>
             return false;
         }
 
-        //fix this to instantiate under a parent object for organization
-        CardView instance = Instantiate(model.ViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation);
+        //CardView instance = Instantiate(model.ViewPrefab, targetPrepArea._cardSpawnLocation.position, targetPrepArea._cardSpawnLocation.rotation, spawnerTransform);
+        CardView instance = spawner.SpawnDesignatedCard(model.ViewPrefab, targetPrepArea._cardSpawnLocation, spawnerTransform);
         instance.InitCard(model);
         instance.CardModel.PlayCard();
 

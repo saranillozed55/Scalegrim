@@ -10,9 +10,19 @@ public static class CardsDamager
         int damage = attackingCard.AttackDamage;
         if (defendingCard == null)
         {
-            Debug.Log("This should damage enemy/person");
-            CardEventBus.RaiseOnDirectDamage(damage);
-            //CombatManager.Instance.PlayerTakeDamage(damage);
+            var owner = attackingCard.BoardOwner;
+
+            if(owner != null)
+            {
+                if(owner == AreaOwnerType.PlayerActive) // should do damage to enemy
+                {
+                    CardEventBus.RaiseOnDirectEnemyDamage(damage);
+                }
+                else if(owner == AreaOwnerType.EnemyActive) // should do damage to player
+                {
+                    CardEventBus.RaiseOnDirectPlayerDamage(damage);
+                }
+            }
         }
         else
         {

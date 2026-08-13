@@ -41,6 +41,7 @@ public class PauseMenu : BaseUI
         _backToGameButton = Container.Q<Button>("BackToGameButton");
         _optionsButton = Container.Q<Button>("OptionsButton");
         _quitButton = Container.Q<Button>("QuitButton");
+        GameplayBehaviourManager.Instance.DisableGameplay();
 
         if (_backToGameButton == null || _optionsButton == null || _quitButton == null)
         {
@@ -59,6 +60,7 @@ public class PauseMenu : BaseUI
         _backToGameButton.UnregisterCallback<ClickEvent>(OnBackToGameButtonClicked);
         _optionsButton.UnregisterCallback<ClickEvent>(OnOptionsButtonClicked);
         _quitButton.UnregisterCallback<ClickEvent>(OnQuitButtonClicked);
+        GameplayBehaviourManager.Instance.EnableGameplay();
     }
     private void OnBackToGameButtonClicked(ClickEvent evt)
     {

@@ -119,10 +119,16 @@ public class HandManager : GenericSingleton<HandManager>
 
     private void HandleCardHover() // maybe move this to not in manager and let card view handle its own hover state, but manager can handle the raycast and tell the card to hover
     {
+        if (!GameplayBehaviourManager.Instance.GameplayInputEnabled)
+        {
+            ClearHoveredCard();
+            return;
+        }
         if (Physics.Raycast(_mousePosition.GetMouseRay(), out RaycastHit hit, Mathf.Infinity, _cardLayer))
         {
             // handCards contains the root CardView of the card prefab, so get the root's component
-            CardView hitCard = hit.collider.transform.root.GetComponent<CardView>();
+            // TODO: use IHoverable for this or just move it out of this script
+            CardView hitCard = hit.collider.GetComponentInParent<CardView>();
 
             if (hitCard == _currentHoveredCard)
             {
@@ -145,12 +151,17 @@ public class HandManager : GenericSingleton<HandManager>
         }
         else
         {
+            ClearHoveredCard();
             // raycast hit nothing
-            if (_currentHoveredCard != null)
-            {
-                _currentHoveredCard.OnHoverExit();
-                _currentHoveredCard = null;
-            }
+        }
+    }
+
+    private void ClearHoveredCard()
+    {
+        if(_currentHoveredCard != null)
+        {
+            _currentHoveredCard.OnHoverExit();
+            _currentHoveredCard = null;
         }
     }
 

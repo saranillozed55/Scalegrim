@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -5,19 +6,59 @@ public class SoundMixerManager : GenericSingleton<SoundMixerManager>
 {
 
     [SerializeField] private AudioMixer audioMixer;
+    [SerializeField] private PlayerSoundSO soundSO;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        soundSO.LoadFromPrefs();
+
+        soundSO.OnMasterVolumeChanged += SetMasterVolume;
+        soundSO.OnSFXVolumeChanged += SetSFXVolume;
+        soundSO.OnMusicVolumeChanged += SetMusicVolume;
+    }
+    private void Start()
+    {
+        SetMasterVolume(soundSO.masterVolume);
+        SetSFXVolume(soundSO.sfxVolume);
+        SetMusicVolume(soundSO.musicVolume);
+    }
+    private void OnDestroy()
+    {
+        soundSO.OnMasterVolumeChanged -= SetMasterVolume;
+        soundSO.OnSFXVolumeChanged -= SetSFXVolume;
+        soundSO.OnMusicVolumeChanged -= SetMusicVolume;
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.Save();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause) PlayerPrefs.Save();
+    }
 
     public void SetMasterVolume(float level)
     {
-        audioMixer.SetFloat("masterVolume", Mathf.Log10(level) * 20f );
+        bool ok = audioMixer.SetFloat("masterVolume", LevelToDb(level));
+        if (!ok) Debug.LogWarning($"Failed to set masterVolume - check exposed parameter name on the AudioMixer.");
     }
+
     public void SetSFXVolume(float level)
     {
-
-        audioMixer.SetFloat("sfxVolume", Mathf.Log10(level) * 20f);
+        bool ok = audioMixer.SetFloat("sfxVolume", LevelToDb(level));
+        if (!ok) Debug.LogWarning("Failed to set sfxVolume - check exposed parameter name on the AudioMixer.");
     }
+
+
     public void SetMusicVolume(float level)
     {
+        bool ok = audioMixer.SetFloat("musicVolume", LevelToDb(level));
+        if (!ok) Debug.LogWarning($"Failed to set musicVolume - check exposed parameter name on the AudioMixer.");
 
-        audioMixer.SetFloat("musicVolume", Mathf.Log10(level) * 20f);
     }
+    private float LevelToDb(float level) => Mathf.Log10(Mathf.Max(level, 0.0001f)) * 20f;
 }

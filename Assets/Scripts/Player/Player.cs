@@ -15,12 +15,12 @@ namespace MainPlayer
 
         private void OnEnable()
         {
-            CardEventBus.OnDirectDamage += TakeDamage;
+            CardEventBus.OnDirectPlayerDamage += TakeDamage;
         }
 
         private void OnDisable()
         {
-            CardEventBus.OnDirectDamage -= TakeDamage;
+            CardEventBus.OnDirectPlayerDamage -= TakeDamage;
         }
 
         public void Initialize(PlayerData data) // this should be used for reading off of json later
@@ -32,7 +32,7 @@ namespace MainPlayer
         public void TakeDamage(int damageAmount)
         {
             Health = Mathf.Max(0, Health - damageAmount);
-            Debug.Log($"Damage taken: {damageAmount}, HP left {Health}");
+            Debug.Log($"Player Health: {Health}");
         }
 
         public PlayerData GetPlayerData()

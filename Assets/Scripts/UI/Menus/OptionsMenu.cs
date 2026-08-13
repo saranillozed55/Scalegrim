@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 
 public class OptionsMenu : BaseUI
 {
+    [SerializeField] private PlayerSoundSO soundSO;
 
     private Slider _masterVolumeSlider;
     private Slider _sfxVolumeSlider;
@@ -42,14 +43,26 @@ public class OptionsMenu : BaseUI
         _musicVolumeSlider = Container.Q<Slider>("MusicVolumeSlider");
         _closeButton = Container.Q<Button>("CloseButton");
 
+        // Push current SO values onto the sliders before wiring up callbacks
+        _masterVolumeSlider?.SetValueWithoutNotify(soundSO.masterVolume);
+        _sfxVolumeSlider?.SetValueWithoutNotify(soundSO.sfxVolume);
+        _musicVolumeSlider?.SetValueWithoutNotify(soundSO.musicVolume);
 
         _masterVolumeSlider?.RegisterValueChangedCallback(OnSliderValueChanged);
         _sfxVolumeSlider?.RegisterValueChangedCallback(OnSliderValueChanged);
         _musicVolumeSlider?.RegisterValueChangedCallback(OnSliderValueChanged);
+        _masterVolumeSlider?.RegisterCallback<PointerUpEvent>(_ => PlayerPrefs.Save());
+        _sfxVolumeSlider?.RegisterCallback<PointerUpEvent>(_ => PlayerPrefs.Save());
+        _musicVolumeSlider?.RegisterCallback<PointerUpEvent>(_ => PlayerPrefs.Save());
 
 
         _closeButton?.RegisterCallback<ClickEvent>(OnCloseOptionsButtonClicked);
         _closeButton?.RegisterCallback<MouseEnterEvent>(OnCloseButtonHovered);
+
+        // If soundSO changes from elsewhere (e.g. a "reset to default" button), reflect it in UI.
+        soundSO.OnMasterVolumeChanged += OnMasterChangedExternally;
+        soundSO.OnSFXVolumeChanged += OnSFXChangedExternally;
+        soundSO.OnMusicVolumeChanged += OnMusicChangedExternally;
     }
 
     private void Unregister()
@@ -64,19 +77,23 @@ public class OptionsMenu : BaseUI
 
     private void OnSliderValueChanged(ChangeEvent<float> evt)
     {
-        if(evt.target == _masterVolumeSlider)
+        if (evt.target == _masterVolumeSlider)
         {
-            SoundMixerManager.Instance.SetMasterVolume(evt.newValue);
+            soundSO.SetMasterVolume(evt.newValue);
         }
-        else if(evt.target == _sfxVolumeSlider)
+        else if (evt.target == _sfxVolumeSlider)
         {
-            SoundMixerManager.Instance.SetSFXVolume(evt.newValue);
+            soundSO.SetSFXVolume(evt.newValue);
         }
-        else if(evt.target == _musicVolumeSlider)
+        else if (evt.target == _musicVolumeSlider)
         {
-            SoundMixerManager.Instance.SetMusicVolume(evt.newValue);
+            soundSO.SetMusicVolume(evt.newValue);
         }
     }
+
+    private void OnMasterChangedExternally(float v) => _masterVolumeSlider.SetValueWithoutNotify(v);
+    private void OnSFXChangedExternally(float v) => _sfxVolumeSlider.SetValueWithoutNotify(v);
+    private void OnMusicChangedExternally(float v) => _musicVolumeSlider.SetValueWithoutNotify(v);
 
     private void OnCloseButtonHovered(MouseEnterEvent evt)
     {

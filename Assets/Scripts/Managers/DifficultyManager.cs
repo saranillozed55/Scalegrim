@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class DifficultyManager : GenericSingleton<DifficultyManager>
+
+public class DifficultyManager : MonoBehaviour
 {
 
     public int DifficultyLevel { get; private set; } = 1;

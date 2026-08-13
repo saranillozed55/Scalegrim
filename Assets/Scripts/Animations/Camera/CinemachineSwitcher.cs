@@ -9,6 +9,7 @@ public enum CameraState
     BoardCamera,
     PlayerHandCamera,
     PlayerDeckCamera,
+    BoardCameraExtend,
 }
 
 public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
@@ -21,6 +22,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     [SerializeField] private CinemachineCamera _firstPersonCamera;
     [SerializeField] private CinemachineCamera _boardCamera;
+    [SerializeField] private CinemachineCamera _boardCameraExtend;
     [SerializeField] private CinemachineCamera _startingCamera;
     [SerializeField] private CinemachineCamera _playerDeckCamera;
     [SerializeField] private CinemachineCamera _playerHandCamera;
@@ -60,15 +62,21 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
             {CameraState.FPCamera, _firstPersonCamera},
             {CameraState.BoardCamera, _boardCamera},
             {CameraState.PlayerDeckCamera, _playerDeckCamera},
-            {CameraState.PlayerHandCamera, _playerHandCamera}
+            {CameraState.PlayerHandCamera, _playerHandCamera},
+            {CameraState.BoardCameraExtend, _boardCameraExtend}
         };
     }
 
+    /* REFACTOR: IMPROVE THIS if necessary*/
     private void HandleForwardButton()
     {
         if (_currentCameraState == CameraState.PlayerHandCamera)
         {
             SwitchState(CameraState.FPCamera);
+        }
+        else if(_currentCameraState == CameraState.BoardCamera)
+        {
+            SwitchState(CameraState.BoardCameraExtend);
         }
         else if (_currentCameraState == CameraState.FPCamera)
         {
@@ -81,6 +89,10 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
         if (_currentCameraState == CameraState.FPCamera)
         {
             SwitchState(CameraState.PlayerHandCamera);
+        }
+        else if(_currentCameraState == CameraState.BoardCameraExtend)
+        {
+            SwitchState(CameraState.BoardCamera);
         }
         else if (_currentCameraState == CameraState.BoardCamera)
         {

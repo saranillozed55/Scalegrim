@@ -1,7 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/USS/hidden.uss?fileID=7433441132597879392&amp;guid=71bb5b1fd9babe6498ad939800cf8396&amp;type=3#hidden"/>
     <Style src="project://database/Assets/USS/Buttons.uss?fileID=7433441132597879392&amp;guid=cfe416da2478d604da5eda32f582fca5&amp;type=3#Buttons"/>
-    <ui:VisualElement name="Container" style="flex-grow: 1; visibility: visible; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
+    <ui:VisualElement name="Container" picking-mode="Position" style="flex-grow: 1; visibility: visible; position: absolute; top: 0; left: 0; bottom: 0; right: 0;">
         <ui:Button text="Back To Game" name="BackToGameButton" class="button" style="margin-top: 16px; height: 90px; align-items: stretch; -unity-font-style: normal;"/>
         <ui:Button text="Options" name="OptionsButton" class="button" style="align-items: stretch; width: 538px; height: 99px; left: 700px; font-size: 42px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; margin-bottom: 95px; position: absolute; top: 410px;"/>
         <ui:Button text="Quit" name="QuitButton" class="button" style="align-items: stretch; width: 538px; height: 99px; left: 700px; font-size: 42px; border-top-left-radius: 14px; border-top-right-radius: 14px; border-bottom-right-radius: 14px; border-bottom-left-radius: 14px; margin-bottom: 95px; position: absolute; top: 610px;"/>

@@ -4,11 +4,16 @@ namespace Cards.Events
 {
     public static class CardEventBus
     {
-        public static event Action<int> OnDirectDamage;
+        public static event Action<int> OnDirectPlayerDamage;
+        public static event Action<int> OnDirectEnemyDamage;
 
-        public static void RaiseOnDirectDamage(int val)
+        public static void RaiseOnDirectPlayerDamage(int val)
         {
-            OnDirectDamage?.Invoke(val);
+            OnDirectPlayerDamage?.Invoke(val);
+        }
+        public static void RaiseOnDirectEnemyDamage(int val)
+        {
+            OnDirectEnemyDamage?.Invoke(val);
         }
     }
 }

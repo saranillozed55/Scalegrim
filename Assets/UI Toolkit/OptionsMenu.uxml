@@ -5,9 +5,9 @@
     <ui:VisualElement name="Container" style="flex-grow: 1;">
         <ui:VisualElement name="Box" style="flex-grow: 1; position: absolute; height: 100%; width: 50%; top: 0; left: 25%; bottom: 0; right: auto; background-color: rgba(0, 0, 0, 0.51);">
             <ui:Label text="OPTIONS" name="OptionsLabel" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/edo/edo.ttf?fileID=12800000&amp;guid=6731d5cd2ac1bab4eb8b39fb056c197e&amp;type=3#edo&quot;); -unity-text-align: upper-center; font-size: 64px; -unity-font-style: bold;"/>
-            <ui:Slider label="Master Volume" name="MasterVolumeSlider" inverted="false" value="0.5" low-value="0.0001" high-value="1" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 150px;"/>
-            <ui:Slider label="SFX Volume&#10;" value="0.5" high-value="1" name="SFXVolumeSlider" inverted="false" low-value="0.0001" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 300px; flex-grow: 0; flex-shrink: 1;"/>
-            <ui:Slider label="Music Volume&#10;" value="0.5" high-value="1" name="MusicVolumeSlider" inverted="false" low-value="0.0001" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 450px;"/>
+            <ui:Slider label="Master Volume" name="MasterVolumeSlider" inverted="false" value="0.5" low-value="0.0001" high-value="1" data-source="" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 150px;"/>
+            <ui:Slider label="SFX Volume&#10;" value="0.5" high-value="1" name="SFXVolumeSlider" inverted="false" low-value="0.0001" data-source="" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 300px; flex-grow: 0; flex-shrink: 1;"/>
+            <ui:Slider label="Music Volume&#10;" value="0.5" high-value="1" name="MusicVolumeSlider" inverted="false" low-value="0.0001" data-source="" class="slider" style="position: absolute; height: 93px; width: 560px; -unity-text-align: upper-center; top: 450px;"/>
             <ui:Button text="X" name="CloseButton" class="button" style="position: absolute; top: 16px; left: 816px; height: 57px; width: 118px; font-size: 45px;"/>
         </ui:VisualElement>
     </ui:VisualElement>

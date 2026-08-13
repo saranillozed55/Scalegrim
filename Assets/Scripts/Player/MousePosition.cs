@@ -27,6 +27,7 @@ public class MousePosition : MonoBehaviour
 
     private void HandleLeftClickPressed()
     {
+        if (!GameplayBehaviourManager.Instance.GameplayInputEnabled) return;
         if (!TryGetHit(out RaycastHit hit) || InputManager.Instance.IsPointerOverUI) return;
 
         var clickable = hit.collider.GetComponentInParent<IClickable>();
@@ -39,6 +40,7 @@ public class MousePosition : MonoBehaviour
 
     private void HandleRightClickPressed()
     {
+        if (!GameplayBehaviourManager.Instance.GameplayInputEnabled) return;
         if (!TryGetHit(out RaycastHit hit)) return;
         Debug.Log("Clicked card: " + hit.collider.gameObject.name);
     }
