@@ -18,7 +18,6 @@ public class EnemyTurnQueue
         {
             _queue.Enqueue(entries);
         }
-
     }
 
     public BlueprintTurn GetTurnBlueprint()

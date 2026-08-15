@@ -9,14 +9,26 @@ public class UIManager : GenericSingleton<UIManager>
     [Header("Broadcast to Event Channels")]
     [SerializeField] private VoidEventChannel _initialPauseMenu;
 
-    private void OnEnable()
+    private void Start()
+    {
+        SubscribeToEvents();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        UnsubscribeToEvents();
+    }
+
+    private void SubscribeToEvents()
     {
         InputManager.Instance.OnPauseButtonPressed += OnPauseRaised;
     }
 
-    private void OnDisable()
+    private void UnsubscribeToEvents()
     {
-        InputManager.Instance.OnPauseButtonPressed -= OnPauseRaised;
+        if(InputManager.Instance != null)
+            InputManager.Instance.OnPauseButtonPressed -= OnPauseRaised;
     }
 
     private void OnPauseRaised()

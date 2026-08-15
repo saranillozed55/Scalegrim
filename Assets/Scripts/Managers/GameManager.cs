@@ -33,20 +33,31 @@ public class GameManager : GenericSingleton<GameManager>
         };
     }
 
+    private void Start()
+    {
+        SubscribeToEvents();   
+    }
+
     private void Update()
     {
         Cursor.lockState = onFocus ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
-    private void OnEnable()
+    protected override void OnDestroy()
     {
-        InputManager.Instance.OnPauseButtonPressed += OnGameStatePaused;
-
+        UnsubscribeToEvents();
     }
 
-    private void OnDisable()
+    private void SubscribeToEvents()
     {
-        InputManager.Instance.OnPauseButtonPressed -= OnGameStatePaused;
+        InputManager.Instance.OnPauseButtonPressed += OnGameStatePaused;
+    }
+    private void UnsubscribeToEvents()
+    {
+        if(InputManager.Instance != null)
+        {
+            InputManager.Instance.OnPauseButtonPressed -= OnGameStatePaused;
+        }
     }
 
     //Link pause and play together later

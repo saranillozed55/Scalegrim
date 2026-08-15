@@ -2,35 +2,29 @@ using UnityEngine;
 
 public abstract class GenericSingleton<T> : MonoBehaviour where T : MonoBehaviour 
 {
-    private static T instance;
+    //private static T instance;
     public static T Instance
     {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindFirstObjectByType<T>();
-                if (instance == null)
-                {
-                    GameObject go = new GameObject(typeof(T).Name);
-                    instance = go.AddComponent<T>();
-                    DontDestroyOnLoad(go);
-                }
-            }
-            return instance;
-        }
+        get;
+        private set;
     }
 
     protected virtual void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this as T;
-            DontDestroyOnLoad(gameObject);
+            Instance = this as T;
+            DontDestroyOnLoad(this as T);
         }
-        else if (instance != this && instance != null)
+        else
         {
             Destroy(gameObject);
         }
+    }
+
+    protected virtual void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
     }
 }

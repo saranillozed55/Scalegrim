@@ -93,7 +93,7 @@ public class CardModel : IDamageable
         }
     }
 
-    public void CardAttack(CardModel attackingCard, CardModel defendingCard)
+    public void CardAttack(CardModel attackingCard, CardModel defendingCard) // this shouldn't know about the defending card
     {
         CardsDamager.ApplyDamage(attackingCard, defendingCard);
     }

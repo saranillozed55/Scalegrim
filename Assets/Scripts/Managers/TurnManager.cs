@@ -11,13 +11,16 @@ public class TurnManager : GenericSingleton<TurnManager>
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onPlayerEndTurn;
-    [SerializeField] private VoidEventChannel _onEnemyEndTurn;
+    //[SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
     private Dictionary<TurnState, Action> turnStates;
+
+    [SerializeField] private PlayerDeckStack playerDeckStack;
 
     protected override void Awake()
     {
         base.Awake();
+        playerDeckStack = FindAnyObjectByType<PlayerDeckStack>();
         turnStates = new Dictionary<TurnState, Action>
         {
             {TurnState.PlayerTurn, PlayerTurn },
@@ -33,18 +36,27 @@ public class TurnManager : GenericSingleton<TurnManager>
     private void OnEnable()
     {
         _onPlayerEndTurn.onEventRaised += SwitchTurnState;
-        _onEnemyEndTurn.onEventRaised += SwitchTurnState;
+        //_onEnemyEndTurn.onEventRaised += SwitchTurnState;
+        CombatManager.Instance.OnCombatTurnEnded += SwitchTurnState;
     }
 
     private void OnDisable()
     {
         _onPlayerEndTurn.onEventRaised -= SwitchTurnState;
-        _onEnemyEndTurn.onEventRaised -= SwitchTurnState;
+        //_onEnemyEndTurn.onEventRaised -= SwitchTurnState;
+        CombatManager.Instance.OnCombatTurnEnded -= SwitchTurnState;
     }
 
     private void PlayerTurn()
     {
-        CinemachineSwitcher.Instance.SwitchState(CameraState.PlayerDeckCamera);
+        if (playerDeckStack != null && !playerDeckStack.CantDrawCards())
+        {
+            CinemachineSwitcher.Instance.SwitchState(CameraState.PlayerDeckCamera);
+        }
+        else
+        {
+            CinemachineSwitcher.Instance.SwitchState(CameraState.FPCamera);
+        }
         //await probably in handmanager so we can wait until we have drawn card
         //this should be the only one sending out events
         Debug.Log("PlayerTurn");
@@ -59,9 +71,9 @@ public class TurnManager : GenericSingleton<TurnManager>
         Debug.Log("EnemyTurn");
     }
 
-    private void SwitchTurnState() 
+    private void SwitchTurnState()
     {
-        if(CurrentTurnState == TurnState.PlayerTurn)
+        if (CurrentTurnState == TurnState.PlayerTurn)
         {
             SwitchTurnState(TurnState.EnemyTurn);
         }
@@ -75,7 +87,7 @@ public class TurnManager : GenericSingleton<TurnManager>
     {
         CurrentTurnState = newState;
 
-        if(!turnStates.TryGetValue(newState, out Action action))
+        if (!turnStates.TryGetValue(newState, out Action action))
         {
             return;
         }

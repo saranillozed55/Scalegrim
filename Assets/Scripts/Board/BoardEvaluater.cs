@@ -64,3 +64,36 @@
 //        return laneScore;
 //    }
 //}
+using System;
+using UnityEngine;
+public class BoardEvaluater
+{
+    //Do we even need this? -> Want to evaluate lane based on
+    //Don't want to return high values if there is already an enemyCard in that lane because we can't play the card in that lane
+    public float EvaluateLane(BoardState boardState)
+    {
+        
+        foreach(LaneSnapShot shot in boardState.LanesShot)
+        {
+            bool hasplayerCard = shot.PlayerCard != null;
+            bool hasEnemyCard = shot.EnemyCard != null;
+
+            if (hasplayerCard && hasEnemyCard)
+            {
+                // may change later
+                return -999;
+            }
+            else if (hasplayerCard && !hasEnemyCard)
+            {
+                CardModel playerCardModel = shot.PlayerCard.Value.cardModel;
+                int damage = playerCardModel.AttackDamage;
+                return damage;
+            }
+            
+        }
+        return 0;
+    }
+
+
+}
+

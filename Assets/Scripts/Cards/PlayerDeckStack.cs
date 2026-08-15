@@ -122,7 +122,7 @@ public class PlayerDeckStack : MonoBehaviour, IClickable, ICardSpawner
     }
 
 
-    private bool CantDrawCards()
+    public bool CantDrawCards()
     {
         return (_isPopping || !canDrawCards || !_stackLoaded || _deckCards.Count == 0);
     }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -31,27 +32,16 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 
     private CinemachineCamera _currentCamera;
 
-
-    private void OnEnable()
-    {
-        InputManager.Instance.OnBackButtonPressed += HandleBackButton;
-        InputManager.Instance.OnForwardButtonPressed += HandleForwardButton;
-
-    }
-    private void OnDisable()
-    {
-        InputManager.Instance.OnBackButtonPressed -= HandleBackButton;
-        InputManager.Instance.OnForwardButtonPressed -= HandleForwardButton;
-    }
-
-    private void Update()
-    {
-
-    }
-
     private void Start()
     {
         InitCameras();
+        SubscribeToEvents();
+    }
+
+    protected override void OnDestroy()
+    {
+        UnsubscribeToEvents();
+        base.OnDestroy();
     }
 
     private void InitCameras()
@@ -66,6 +56,19 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
             {CameraState.BoardCameraExtend, _boardCameraExtend}
         };
     }
+    private void SubscribeToEvents()
+    {
+        InputManager.Instance.OnBackButtonPressed += HandleBackButton;
+        InputManager.Instance.OnForwardButtonPressed += HandleForwardButton;
+    }
+    private void UnsubscribeToEvents()
+    {
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnBackButtonPressed -= HandleBackButton;
+            InputManager.Instance.OnForwardButtonPressed -= HandleForwardButton;
+        }
+    }
 
     /* REFACTOR: IMPROVE THIS if necessary*/
     private void HandleForwardButton()
@@ -74,7 +77,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
         {
             SwitchState(CameraState.FPCamera);
         }
-        else if(_currentCameraState == CameraState.BoardCamera)
+        else if (_currentCameraState == CameraState.BoardCamera)
         {
             SwitchState(CameraState.BoardCameraExtend);
         }
@@ -90,7 +93,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
         {
             SwitchState(CameraState.PlayerHandCamera);
         }
-        else if(_currentCameraState == CameraState.BoardCameraExtend)
+        else if (_currentCameraState == CameraState.BoardCameraExtend)
         {
             SwitchState(CameraState.BoardCamera);
         }

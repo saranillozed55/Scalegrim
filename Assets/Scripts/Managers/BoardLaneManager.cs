@@ -24,7 +24,6 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>, ICardSpawner
 
     public IReadOnlyList<Lane> LogicLanes => logicLanes;
 
-    private LaneBuilder laneBuilder = new LaneBuilder(); // not sure when to use this yet
     private CardSpawner spawner;
 
     protected override void Awake()
@@ -183,7 +182,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>, ICardSpawner
     {
         BoardState state = new BoardState()
         {
-            Lanes = new List<LaneSnapShot>()
+            LanesShot = new List<LaneSnapShot>()
         };
 
         foreach(var lane in logicLanes)
@@ -195,7 +194,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>, ICardSpawner
                 PlayerCard = ToSnapShot(lane.PlayerActiveCard),
                 EnemyQueuedCard = ToSnapShot(lane.EnemyQueuedCard)
             };
-            state.Lanes.Add(snapShot);
+            state.LanesShot.Add(snapShot);
         }
         return state;
     }

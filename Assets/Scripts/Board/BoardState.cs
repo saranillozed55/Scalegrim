@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct BoardState
 {
-    public List<LaneSnapShot> Lanes;
+    public List<LaneSnapShot> LanesShot;
 }
 
 public struct LaneSnapShot
@@ -18,8 +18,4 @@ public struct LaneSnapShot
 public struct CardSnapShot
 {
     public CardModel cardModel;
-    //public string CardName;
-    //public int Health;
-    //public int Attack;
-    //public Owner Owner;
 }

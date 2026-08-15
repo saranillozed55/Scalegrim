@@ -24,8 +24,9 @@ public class SoundMixerManager : GenericSingleton<SoundMixerManager>
         SetSFXVolume(soundSO.sfxVolume);
         SetMusicVolume(soundSO.musicVolume);
     }
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         soundSO.OnMasterVolumeChanged -= SetMasterVolume;
         soundSO.OnSFXVolumeChanged -= SetSFXVolume;
         soundSO.OnMusicVolumeChanged -= SetMusicVolume;

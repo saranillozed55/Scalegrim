@@ -6,7 +6,6 @@ using UnityEngine;
 [Serializable] 
 public class BlueprintEntry
 {
-
     public CardDataSO card;
     public EntryType type;
     public Group group; // use for random group or random cost

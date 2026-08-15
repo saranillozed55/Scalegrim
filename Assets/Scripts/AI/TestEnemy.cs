@@ -7,13 +7,15 @@ using UnityEngine;
 public class TestEnemy : MonoBehaviour, IDamageable
 {
     [Header("Blueprint list")]
-    [SerializeField] private List<Blueprint> _bluePrints; // each enemy should have a list of blueprints, but for testing purposes we will have a list of blueprints in this script
+    [SerializeField] private List<Blueprint> _bluePrints; // each enemy should have a list of blueprints, 
+    // but for testing purposes we will have a list of blueprints in this script
     //I believe after reaching a different point in the game, the enemy will get different blueprint lists 
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
-    //This specific broadcast should be use for all enemies since all enemies will have the same logic, except for bosses
+    //This specific broadcast should be use for all enemies since all enemies will have the same logic, 
+    //except for bosses
 
     [Header("Broadcast to Event Channels")]
     [SerializeField] private VoidEventChannel _onSurrenderPerformed;
@@ -55,9 +57,9 @@ public class TestEnemy : MonoBehaviour, IDamageable
     {
         BoardState currState = BoardLaneManager.Instance.CaptureBoardState();
 
-        for (int i = 0; i < currState.Lanes.Count; i++)
+        for (int i = 0; i < currState.LanesShot.Count; i++)
         {
-            Debug.Log($" LaneIndex {i + 1}, EnemyQueuedCard: {currState.Lanes[i].EnemyQueuedCard}, EnemyCard: {currState.Lanes[i].EnemyCard},  PlayerCard: {currState.Lanes[i].PlayerCard}");
+            Debug.Log($" LaneIndex {i + 1}, EnemyQueuedCard: {currState.LanesShot[i].EnemyQueuedCard}, EnemyCard: {currState.LanesShot[i].EnemyCard},  PlayerCard: {currState.LanesShot[i].PlayerCard}");
         }
         return currState;
     }
@@ -84,6 +86,8 @@ public class TestEnemy : MonoBehaviour, IDamageable
 
         Blueprint blueprint = blueprintRetriever.GetBlueprintByDifficultyAndRandom(GetDifficultyLevel());
 
+        //HERE: SHOULD GET THE BLUEPRINT FOR ENEMIES USING THEIR ID THEN WE CAN GRAB THE SPECIFIC BLUEPRINT AND RANDOMIZE
+
         Debug.Log($"Blueprint chosen: {blueprint.name}, Difficulty: {blueprint.difficultyLevelOfBlueprint}");
         enemyTurnQueue.GenerateEnemyQueue(blueprint);
     }
@@ -102,7 +106,7 @@ public class TestEnemy : MonoBehaviour, IDamageable
         if (blueprint == null)
         {
             Debug.Log("Enemy will have to surrender, no more turns");
-            _onSurrenderPerformed.RaiseEvent();
+            _onSurrenderPerformed?.RaiseEvent();
             return false;
         }
 
@@ -110,8 +114,6 @@ public class TestEnemy : MonoBehaviour, IDamageable
 
         foreach (BlueprintEntry turn in blueprint.Entries)
         {
-            //check what type the entry is
-            //if the entry type is random, call a different function to get a random card from that "tribe" or whatever its called
             EntryType type = turn.type;
             EnemyAttackPreference preference = turn.enemyAttackPreference;
 
@@ -168,6 +170,10 @@ public class TestEnemy : MonoBehaviour, IDamageable
     public void TakeDamage(int val)
     {
         Health -= val;
+        if (Health <= 0)
+        {
+
+        }
         Debug.Log($"TestEnemy Health: {Health}");
     }
 

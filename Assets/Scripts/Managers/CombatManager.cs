@@ -2,43 +2,35 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
 using MainPlayer;
+using System;
 public class CombatManager : GenericSingleton<CombatManager>
 {
-    [Header("Broadcast to Event Channels")]
-    [SerializeField] private VoidEventChannel _onEnemyEndTurn;
 
     [Header("Listener to Event Channels")]
     [SerializeField] private VoidEventChannel _onCombatStart;
 
+    private EncounterManager encounterManager;
     private EncounterData _encounterData;
 
-    public int TurnsPassed { get; private set; }
+    public int TurnsPassedThisCombat { get; private set; }
 
     public bool IsInCombat { get; private set; }
 
-    [SerializeField] private Player player;
-
-    protected override void Awake()
-    {
-        base.Awake();
-        player = FindFirstObjectByType<Player>();
-    }
-
-    public void Init(Player player) 
-    {
-        this.player = player;
-    }
+    public event Action OnCombatTurnEnded;
 
     private void Start()
     {
+        encounterManager = FindFirstObjectByType<EncounterManager>();
         IsInCombat = false;
 
         /* Move these into LoadCombat Or something once we have UI stuff*/
+        //Should choose from EncounterData, UpgradeSpotData, stuff like that rather than all in one script
+
         _encounterData = new EncounterData();
         BoardLaneManager.Instance.InitializeBoard(_encounterData);
     }
 
-    private void OnEnable()
+    private void OnEnable() 
     {
         _onCombatStart.onEventRaised += StartCombat;
     }
@@ -48,6 +40,8 @@ public class CombatManager : GenericSingleton<CombatManager>
         _onCombatStart.onEventRaised -= StartCombat;
     }
 
+    //I BELIEVE START COMBAT SHOULD HAPPEN ONCE EVERYTHING HAS BEEN LOADED IN AND INITIALIZED SO USE ASYNC
+    //^ meant to be in EncounterManager
     private async void StartCombat()
     {
         if (IsInCombat) return;
@@ -75,13 +69,20 @@ public class CombatManager : GenericSingleton<CombatManager>
 
             }
         }
-        EndCombat();
+        OnFinishCombatThisTurn();
     }
 
-    public void EndCombat()
+    public void ResetTurnsPassed()
     {
-        TurnsPassed++;
+        TurnsPassedThisCombat = 0;
+    }
+
+    public void OnFinishCombatThisTurn()
+    {
+        TurnsPassedThisCombat++;
         IsInCombat = false;
-        _onEnemyEndTurn.RaiseEvent();
+
+        OnCombatTurnEnded?.Invoke();
+        //_onEnemyEndTurn?.RaiseEvent();
     }
 }

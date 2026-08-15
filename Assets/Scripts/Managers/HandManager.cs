@@ -50,14 +50,17 @@ public class HandManager : GenericSingleton<HandManager>
         HandleCardHover();
     }
 
-    private void OnEnable()
+    private void Start()
     {
+        
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void OnDisable()
+    protected override void OnDestroy()
     {
-        InputManager.Instance.OnBackButtonPressed -= SelectionManager.Instance.DeselectCard;
+        base.OnDestroy();
+        if(InputManager.Instance != null)
+            InputManager.Instance.OnBackButtonPressed -= SelectionManager.Instance.DeselectCard;
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
