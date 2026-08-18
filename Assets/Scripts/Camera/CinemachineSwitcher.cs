@@ -17,9 +17,8 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
 {
     private CameraState _currentCameraState;
 
-    [Header("References")]
+    [Header("Camera References")]
     [Space]
-    [SerializeField] private CinemachineCamera[] _cameras;
 
     [SerializeField] private CinemachineCamera _firstPersonCamera;
     [SerializeField] private CinemachineCamera _boardCamera;
@@ -70,7 +69,7 @@ public class CinemachineSwitcher : GenericSingleton<CinemachineSwitcher>
         }
     }
 
-    /* REFACTOR: IMPROVE THIS if necessary*/
+    //FIXME: Not sure if this should be hard coded or not
     private void HandleForwardButton()
     {
         if (_currentCameraState == CameraState.PlayerHandCamera)

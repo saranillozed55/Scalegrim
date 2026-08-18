@@ -129,7 +129,7 @@ public class TestEnemy : MonoBehaviour, IDamageable
                 Debug.Log($"Type: {type}, Card Name: {turn.card.name}, Card Group: {turn.card.Group}");
 
                 CardModel model = new CardModel(turn.card);
-                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
+                // wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
             }
             else if (type == EntryType.RandomGroup)
             {
@@ -141,7 +141,7 @@ public class TestEnemy : MonoBehaviour, IDamageable
                 CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
                 CardModel model = new CardModel(randomCard);
 
-                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
+                // wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
             }
             else if (type == EntryType.RandomFromAny)
             {
@@ -155,7 +155,7 @@ public class TestEnemy : MonoBehaviour, IDamageable
                 CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
                 CardModel model = new CardModel(randomCard);
 
-                wasPlaced = await cardPlacer.HandlePlaceCard(model, lane); // REMOVE _enemyDeck from this method
+                // wasPlaced = await cardPlacer.HandlePlaceCard(model, lane); // REMOVE _enemyDeck from this method
             }
 
 

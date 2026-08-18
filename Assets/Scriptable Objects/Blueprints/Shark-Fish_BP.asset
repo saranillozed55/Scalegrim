@@ -30,4 +30,4 @@ MonoBehaviour:
       group: 2
       enemyAttackPreference: 0
       cardListFromAny: []
-  difficultyLevelOfBlueprint: 1
+  difficultyLevelOfBlueprint: 2

@@ -41,17 +41,22 @@ public class EncounterManager : MonoBehaviour
     {
         if(Keyboard.current.digit1Key.wasPressedThisFrame)
         {
-            StartEncounter(); // want to try two different encounters later
+            StartEncounter(enemyEncounterData); // want to try two different encounters later
         }
         if(Keyboard.current.digit2Key.wasPressedThisFrame)
         {
-            StartEncounter();
+            StartEncounter(enemyEncounterData);
         }
     }
 
-    private void StartEncounter()
+    /*
+    * This shouldn't just be passing in EnemyEncounterData data, rather it should be passing in the different encounters in one. Maybe like BaseEncounter
+    * Wan't to load whatever encounter the player choose, such as a campfire or a enemy encounter as example
+    * 
+    */
+    private void StartEncounter(EnemyEncounterData data) 
     {
-        currentEncounter = new EnemyEncounter(enemyEncounterData, 15, blueprintRetriever, cardGroupRetriever);
+        currentEncounter = new EnemyEncounter(data, 15, blueprintRetriever, cardGroupRetriever);
         currentEncounter.OnEncounterStart();
     }
 

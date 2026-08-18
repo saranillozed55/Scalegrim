@@ -17,13 +17,13 @@ public class CardGroupRetriever : ScriptableObject
         }
         _cardsByGroup = new();
 
-        _cardsByGroup = _dataBase.AllCards.GroupBy(card => card.Group).ToDictionary(group => group.Key, group => group.ToList());
         // GroupBy groups cards with the same result. Not yet a dictionary but a collection of groups. Ex:
         // Group 1 (Key = Land) - Cards(List): Turtle, Crab, Bear
         // Group 2 (Key = Water) - Cards(List): Fish, Shark, Octopus
         // etc.
 
         // Each group has a Key so group.Key and the value is the group.ToList() so it then creates the dictionary with the key and value.
+        _cardsByGroup = _dataBase.AllCards.GroupBy(card => card.Group).ToDictionary(group => group.Key, group => group.ToList());
     }
 
     public List<CardDataSO> GetCardsByGroup(Group group)

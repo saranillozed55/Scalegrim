@@ -79,7 +79,7 @@ public class BoardLaneManager : GenericSingleton<BoardLaneManager>, ICardSpawner
         logicLanes[laneIndex] = updatedLane;
     }
 
-    public async Task<bool> PlaceEnemyCardsInQueue(CardModel model, int laneIndex)
+    public async Task<bool> PlaceEnemyCardsInQueue(CardModel model, int laneIndex) // should take in a list of CardModels rather than just one model
     {
         if (model == null)
         {

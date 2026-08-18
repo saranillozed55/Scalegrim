@@ -3757,9 +3757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b22b8bf65313294b91694e7c534f71e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatManager
-  _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   _onCombatStart: {fileID: 11400000, guid: 915cc0dac3f10634298ecb97b458aa6e, type: 2}
-  player: {fileID: 872892237}
 --- !u!4 &1344698769
 Transform:
   m_ObjectHideFlags: 0
@@ -4353,7 +4351,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
   _onPlayerStartTurn: {fileID: 11400000, guid: e66634b6ecc462c46957f1d4dbb47b04, type: 2}
   _onPlayerEndTurn: {fileID: 11400000, guid: 65721cbc8d6bdbe419a290e82a9c5eae, type: 2}
-  _onEnemyEndTurn: {fileID: 11400000, guid: 467f1d4d4b73cb3448f06d91a40658ae, type: 2}
   playerDeckStack: {fileID: 0}
 --- !u!4 &1520315114
 Transform:
@@ -4617,7 +4614,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &1786025578
 CapsuleCollider:
   m_ObjectHideFlags: 0

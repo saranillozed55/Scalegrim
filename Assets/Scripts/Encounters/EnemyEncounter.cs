@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 /*
- * This should just be called then whenever we start a combat encounter, probably in CombatManager
+ * This should just be called then whenever we start a combat encounter, probably in EncounterManager
  */
 public class EnemyEncounter : IDamageable
 {
@@ -20,7 +20,7 @@ public class EnemyEncounter : IDamageable
 
     public event System.Action OnFinishedTurn;
 
-    //BlueprintRetriever and CardGroupRetriever could just be static classes maybe
+    //TODO: Work on Enemy
     // Encounter Data should have the list of the blueprints and health probably will be like inscryption where we must get over 5 damage against the enemy
     public EnemyEncounter(EnemyEncounterData enemyEncounterData, int health, BlueprintRetriever blueprintRetriever, CardGroupRetriever cardGroupRetriever)
     {
@@ -91,6 +91,7 @@ public class EnemyEncounter : IDamageable
 
             bool wasPlaced = false;
 
+
             if (type == EntryType.ExactCard)
             {
                 CardModel model = new CardModel(entry.card);
@@ -102,7 +103,7 @@ public class EnemyEncounter : IDamageable
                 List<CardDataSO> cards = cardGroupRetriever.GetCardsByGroup(entry.group);
                 CardDataSO randomCard = cards[Random.Range(0, cards.Count)];
                 CardModel model = new CardModel(randomCard);
-
+                
                 wasPlaced = await cardPlacer.HandlePlaceCard(model, lane);
             }
 
@@ -132,7 +133,6 @@ public class EnemyEncounter : IDamageable
         Debug.Log("Surrender performed");
         hasSurrendered = true;
     }
-
 
 
     public bool HasLost()

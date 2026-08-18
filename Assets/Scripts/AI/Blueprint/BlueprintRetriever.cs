@@ -11,7 +11,7 @@ public class BlueprintRetriever : ScriptableObject
     private void OnEnable()
     {
         if(_bluePrintsByDifficulty != null)
-        {
+            {
             _bluePrintsByDifficulty.Clear(); //not sure if we clear this at onEnable or not, but we should clear it at some point to avoid memory leaks
         }
         _bluePrintsByDifficulty = new();
