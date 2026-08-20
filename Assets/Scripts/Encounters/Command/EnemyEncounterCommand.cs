@@ -1,15 +1,23 @@
+using System.Collections.Generic;
 using UnityEngine;
+using Zeedo.LS.Encounter.Interfaces;
 
-public class EnemyEncounterCommand : IEncounterCommand
+namespace Zeedo.LS.Encounter.Commmand
 {
-
-    public EnemyEncounterCommand()
-    {
-           
-    }
-
-    public void ExecuteEncounter()
+    public class EnemyEncounterCommand : IEncounter
     {
         
+        //store lane data?
+        //store blueprint data?
+
+        public EnemyEncounterCommand()
+        {
+            
+        }
+
+        public void ExecuteEncounter()
+        {
+
+        }
     }
 }

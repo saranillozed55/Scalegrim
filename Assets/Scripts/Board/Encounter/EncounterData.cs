@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Rename this script into LaneEncounterData?
 public class EncounterData 
 {
     private readonly List<Lane> _lanes = new();

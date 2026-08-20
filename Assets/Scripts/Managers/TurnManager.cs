@@ -44,7 +44,9 @@ public class TurnManager : GenericSingleton<TurnManager>
     {
         _onPlayerEndTurn.onEventRaised -= SwitchTurnState;
         //_onEnemyEndTurn.onEventRaised -= SwitchTurnState;
-        CombatManager.Instance.OnCombatTurnEnded -= SwitchTurnState;
+        if(CombatManager.Instance != null) {
+            CombatManager.Instance.OnCombatTurnEnded -= SwitchTurnState;
+        }
     }
 
     private void PlayerTurn()

@@ -1,9 +1,13 @@
 using UnityEngine;
+using Zeedo.LS.Encounter.Interfaces;
 
-public static class EncounterInvoker 
+namespace Zeedo.LS.Encounter.Commmand
 {
-    public static void ExecuteEncounterCommand(IEncounterCommand command)
+    public static class EncounterInvoker
     {
-        command.ExecuteEncounter();
+        public static void ExecuteEncounterCommand(IEncounter command)
+        {
+            command.ExecuteEncounter();
+        }
     }
 }
