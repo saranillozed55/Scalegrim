@@ -7,8 +7,6 @@ public class MousePosition : MonoBehaviour
 {
     [SerializeField] private Camera _renderCamera;
     [SerializeField] private RawImage _rawImage;
-    [SerializeField] private LayerMask _cardLayer;
-
 
     private void Start()
     {
@@ -30,10 +28,10 @@ public class MousePosition : MonoBehaviour
         if (!GameplayBehaviourManager.Instance.GameplayInputEnabled) return;
         if (!TryGetHit(out RaycastHit hit) || InputManager.Instance.IsPointerOverUI) return;
 
-        var clickable = hit.collider.GetComponentInParent<IClickable>();
+        var clickable = hit.collider.GetComponent<IClickable>();
         if (clickable != null)
         {
-            // Handle card click logic here
+            // Handle click logic here
             clickable.OnClick();
         }
     }

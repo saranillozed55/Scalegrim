@@ -1,5 +1,6 @@
 using UnityEngine;
 
+//should just be a plain class i believe and the object that we actually click will call this script
 public class EndTurn : MonoBehaviour, IClickable
 {
     [Header("Broadcast to Event Channels")]

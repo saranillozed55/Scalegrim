@@ -3,19 +3,17 @@ using UnityEngine;
 using Zeedo.LS.Map.Nodes;
 using Zeedo.LS.Encounter.Commmand;
 using Zeedo.LS.Encounter.Interfaces;
+using UnityEngine.EventSystems;
 
 namespace Zeedo.LS.Map.Nodes
 {
-    public class EnemyEncounterNode : MapNodeDataSO
+    public class EnemyEncounterNode : MonoBehaviour, IClickable
     {
 
-        [SerializeField] private List<Blueprint> blueprints;
-
-        public override IEncounter CreateEncounter()
+        public void OnClick()
         {
-            return new EnemyEncounterCommand();
+            //To load I believe we get stuff from MapNodeData and some script process all that data and loads it 
+            //Want to load EnemyEncounter and update MapNode
         }
     }
-
-    
 }
